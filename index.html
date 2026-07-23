@@ -81,8 +81,8 @@
 
   /* ---------- HERO BANNER (conveyor-belt carousel, ดึงจาก tab herobanner) ---------- */
   #heroBanner{
-    max-width:900px; margin:0 auto; overflow:hidden; position:relative;
-    aspect-ratio:2.4/1; border-radius:20px; display:none;
+    max-width:900px; margin:0 auto 32px; overflow:hidden; position:relative;
+    aspect-ratio:2.4/1; border-radius:0; display:none;
     box-shadow:var(--shadow-hover); border:1px solid var(--border);
   }
   #bannerTrack{ display:flex; height:100%; touch-action:pan-y; cursor:grab; }
@@ -229,14 +229,14 @@
 </header>
 
 <section class="hero">
+  <div id="heroBanner"><div id="bannerTrack"></div></div>
+
   <span class="eyebrow">กล่องเก็บความทรงจำ</span>
   <h1>ทุกตั๋ว ทุกบัตร<br>คือช่วงเวลาที่ไม่อยากลืม</h1>
   <p>หย่อนของชิ้นเล็กที่มีความหมายลงกล่อง แล้วเก็บเรื่องราวเบื้องหลังไว้บนโลกออนไลน์ ผ่านรหัสเฉพาะของกล่องคุณเอง</p>
   <div class="hero-actions">
     <a href="create.html" class="btn btn-primary">เก็บความทรงจำของฉัน</a>
   </div>
-
-  <div id="heroBanner"><div id="bannerTrack"></div></div>
 </section>
 
 <div class="stats-bar">
