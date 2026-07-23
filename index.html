@@ -12,11 +12,13 @@
     --surface:#FFFDFB;
     --text:#1A1F2C;
     --text-soft:#5B5750;
+    --primary:#822E2A;
+    --primary-dark:#631F1C;
     --accent:#AD9461;
-    --accent-dark:#6C5846;
     --muted:#AB9E91;
     --forest:#536C62;
     --border:#E5DED4;
+    --line-green:#06C755;
     --radius:16px;
     --shadow:0 8px 24px rgba(26,31,44,0.06);
     --shadow-hover:0 16px 40px rgba(26,31,44,0.10);
@@ -34,93 +36,57 @@
     font-weight:800;
     letter-spacing:-0.01em;
   }
-  .wordmark .cap{ font-size:1.15em; }
+  .wordmark .cap{ font-size:1.15em; color:var(--primary); }
   a{ color:inherit; text-decoration:none; }
   img{ max-width:100%; display:block; }
-  .container{ max-width:1240px; margin:0 auto; padding:0 24px; }
 
-  /* ---------- HEADER ---------- */
+  /* ---------- HEADER (เหลือแค่โลโก้ ไม่ซ้ำซ้อนกับปุ่มด้านล่าง) ---------- */
   header{
-    position:sticky; top:0; z-index:50;
-    background:rgba(245,241,238,0.92);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--border);
-  }
-  .nav{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:18px 24px;
+    padding:20px 24px;
     max-width:1240px; margin:0 auto;
   }
-  .logo{ font-size:24px; color:var(--text); }
-  .nav-links{ display:flex; align-items:center; gap:32px; }
-  .nav-links a{ font-size:15px; font-weight:500; color:var(--text-soft); transition:color .2s; }
-  .nav-links a:hover{ color:var(--accent-dark); }
-  .btn{
-    display:inline-flex; align-items:center; justify-content:center;
-    padding:11px 22px; border-radius:999px;
-    font-size:14px; font-weight:600; cursor:pointer;
-    border:1px solid transparent; transition:all .2s;
-  }
-  .btn-primary{ background:var(--text); color:#fff; }
-  .btn-primary:hover{ background:var(--accent-dark); transform:translateY(-1px); }
-  .btn-outline{ background:transparent; border-color:var(--text); color:var(--text); }
-  .btn-outline:hover{ background:var(--text); color:#fff; }
+  .logo{ font-size:22px; }
 
   /* ---------- HERO ---------- */
   .hero{
-    display:grid; grid-template-columns:1.05fr 0.95fr; gap:56px;
-    align-items:center;
-    padding:72px 24px 64px;
     max-width:1240px; margin:0 auto;
+    padding:8px 24px 48px;
+    text-align:center;
   }
   .eyebrow{
     display:inline-block; font-size:13px; font-weight:600;
     letter-spacing:0.06em; text-transform:uppercase;
-    color:var(--accent-dark); background:rgba(173,148,97,0.14);
+    color:var(--primary); background:rgba(130,46,42,0.08);
     padding:7px 14px; border-radius:999px; margin-bottom:20px;
   }
   .hero h1{
     font-family:'Lexend',sans-serif; font-weight:700;
-    font-size:clamp(34px,4.2vw,54px);
-    line-height:1.12; letter-spacing:-0.01em;
-    margin-bottom:20px;
+    font-size:clamp(30px,4.6vw,50px);
+    line-height:1.16; letter-spacing:-0.01em;
+    margin-bottom:18px;
   }
-  .hero p{ font-size:17px; color:var(--text-soft); max-width:460px; margin-bottom:32px; }
-  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
+  .hero p{
+    font-size:16px; color:var(--text-soft);
+    max-width:520px; margin:0 auto 28px;
+  }
+  .hero-actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:44px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:13px 28px; border-radius:999px;
+    font-size:15px; font-weight:600; cursor:pointer;
+    border:1px solid transparent; transition:all .2s;
+  }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-dark); transform:translateY(-1px); }
 
-  .hero-visual{ position:relative; }
-  .frame-box{
-    position:relative; background:var(--surface);
-    border:1px solid var(--border); border-radius:20px;
-    box-shadow:var(--shadow-hover);
-    padding:28px; aspect-ratio:1/1;
-    display:flex; align-items:center; justify-content:center;
+  /* ---------- HERO BANNER (conveyor-belt carousel, ดึงจาก tab herobanner) ---------- */
+  #heroBanner{
+    max-width:900px; margin:0 auto; overflow:hidden; position:relative;
+    aspect-ratio:2.4/1; border-radius:20px; display:none;
+    box-shadow:var(--shadow-hover); border:1px solid var(--border);
   }
-  .frame-inner{
-    width:100%; height:100%;
-    border:2px solid var(--accent);
-    border-radius:12px;
-    position:relative; overflow:visible;
-    background:
-      linear-gradient(135deg, rgba(173,148,97,0.08), rgba(83,108,98,0.06));
-  }
-  .slot{
-    position:absolute; top:-3px; left:50%; transform:translateX(-50%);
-    width:120px; height:8px; background:var(--text);
-    border-radius:0 0 6px 6px;
-  }
-  .peek-card{
-    position:absolute; width:78px; height:104px;
-    background:var(--surface); border-radius:6px;
-    box-shadow:0 10px 22px rgba(26,31,44,0.16);
-    border:1px solid var(--border);
-  }
-  .peek-card:nth-child(2){ top:14%; left:22%; transform:rotate(-9deg); }
-  .peek-card:nth-child(3){ top:8%; left:44%; transform:rotate(2deg); z-index:2; }
-  .peek-card:nth-child(4){ top:16%; left:64%; transform:rotate(10deg); }
-  .peek-card .stub-strip{ height:18px; background:var(--forest); border-radius:6px 6px 0 0; opacity:0.7;}
-  .peek-card:nth-child(3) .stub-strip{ background:var(--accent); }
-  .peek-card:nth-child(4) .stub-strip{ background:var(--accent-dark); }
+  #bannerTrack{ display:flex; height:100%; touch-action:pan-y; cursor:grab; }
+  #bannerTrack img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
 
   /* ---------- STATS ---------- */
   .stats-bar{
@@ -134,8 +100,18 @@
   .stat b{ font-family:'Lexend',sans-serif; font-size:26px; display:block; color:var(--text); }
   .stat span{ font-size:13px; color:var(--text-soft); }
 
+  .category-summary{ max-width:1240px; margin:0 auto; padding:28px 24px 4px; }
+  .category-summary h3{ font-size:14px; font-weight:700; color:var(--text-soft); margin-bottom:14px; }
+  .category-pills{ display:flex; gap:10px; flex-wrap:wrap; }
+  .category-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:999px; padding:8px 14px; font-size:13px; font-weight:500;
+  }
+  .category-pill b{ color:var(--primary); font-weight:700; }
+
   /* ---------- SEARCH & FILTER ---------- */
-  .search-section{ max-width:1240px; margin:0 auto; padding:48px 24px 0; }
+  .search-section{ max-width:1240px; margin:0 auto; padding:36px 24px 0; }
   .search-bar{
     display:flex; align-items:center; gap:12px;
     background:var(--surface); border:1px solid var(--border);
@@ -157,7 +133,7 @@
     border:none; background:transparent; padding:7px 16px; border-radius:999px;
     font-size:13px; font-weight:600; color:var(--text-soft); cursor:pointer;
   }
-  .view-toggle button.active{ background:var(--text); color:#fff; }
+  .view-toggle button.active{ background:var(--primary); color:#fff; }
 
   /* ---------- CARDS GRID ---------- */
   .cards-section{ max-width:1240px; margin:0 auto; padding:36px 24px 80px; }
@@ -204,7 +180,7 @@
   /* ---------- JUMP TO TOP ---------- */
   .jump-top{
     position:fixed; bottom:28px; right:28px; width:48px; height:48px;
-    border-radius:50%; background:var(--text); color:#fff;
+    border-radius:50%; background:var(--primary); color:#fff;
     display:flex; align-items:center; justify-content:center;
     border:none; cursor:pointer; box-shadow:var(--shadow-hover);
     opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
@@ -218,73 +194,61 @@
   .footer-inner{ max-width:1240px; margin:0 auto; padding:56px 24px 32px; }
   .footer-top{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:32px; margin-bottom:36px; }
   .footer-logo{ font-size:22px; color:#fff; margin-bottom:10px; }
-  .footer-tagline{ font-size:13.5px; color:#B9B3A9; max-width:280px; }
+  .footer-logo .cap{ color:var(--accent); }
+  .footer-tagline{ font-size:13.5px; color:#B9B3A9; max-width:280px; margin-bottom:20px; }
+  .footer-social{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .tiktok-icon{
+    width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08);
+    display:flex; align-items:center; justify-content:center; transition:background .2s;
+  }
+  .tiktok-icon:hover{ background:rgba(255,255,255,0.16); }
+  .line-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--line-green); color:#fff; font-weight:700; font-size:14px;
+    padding:10px 20px; border-radius:999px; transition:filter .2s;
+  }
+  .line-btn:hover{ filter:brightness(1.06); }
   .footer-links{ display:flex; gap:48px; flex-wrap:wrap; }
   .footer-col h4{ font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#B9B3A9; margin-bottom:14px; }
   .footer-col a{ display:block; font-size:14px; color:#EDE9E3; margin-bottom:10px; opacity:0.85; }
   .footer-col a:hover{ opacity:1; color:var(--accent); }
-  .social-row{ display:flex; gap:14px; }
-  .social-row a{
-    width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08);
-    display:flex; align-items:center; justify-content:center; font-size:14px;
-  }
-  .social-row a:hover{ background:var(--accent); }
   .footer-bottom{
     border-top:1px solid rgba(255,255,255,0.1); padding-top:24px;
     font-size:12.5px; color:#8D8880;
   }
 
   @media(max-width:860px){
-    .hero{ grid-template-columns:1fr; padding-top:40px; }
-    .hero-visual{ order:-1; max-width:340px; margin:0 auto; }
-    .nav-links{ display:none; }
+    .stats-row{ gap:28px; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="nav">
-    <div class="logo wordmark"><span class="cap">M</span>eMorery</div>
-    <nav class="nav-links">
-      <a href="#cards">หน้าแรก</a>
-      <a href="about.html">About</a>
-    </nav>
-    <div style="display:flex; gap:10px;">
-      <a href="edit.html" class="btn btn-outline">เข้าสู่ระบบ</a>
-      <a href="create.html" class="btn btn-primary">สร้างโปรไฟล์</a>
-    </div>
-  </div>
+  <div class="logo wordmark"><span class="cap">M</span>eMorery</div>
 </header>
 
 <section class="hero">
-  <div>
-    <span class="eyebrow">กล่องเก็บความทรงจำ</span>
-    <h1>ทุกตั๋ว ทุกบัตร<br>คือช่วงเวลาที่ไม่อยากลืม</h1>
-    <p>หย่อนของชิ้นเล็กที่มีความหมายลงกล่อง แล้วเก็บเรื่องราวเบื้องหลังไว้บนโลกออนไลน์ ผ่านรหัสเฉพาะของกล่องคุณเอง</p>
-    <div class="hero-actions">
-      <a href="create.html" class="btn btn-primary">เริ่มเก็บความทรงจำ</a>
-      <a href="#cards" class="btn btn-outline">สำรวจของคนอื่น</a>
-    </div>
+  <span class="eyebrow">กล่องเก็บความทรงจำ</span>
+  <h1>ทุกตั๋ว ทุกบัตร<br>คือช่วงเวลาที่ไม่อยากลืม</h1>
+  <p>หย่อนของชิ้นเล็กที่มีความหมายลงกล่อง แล้วเก็บเรื่องราวเบื้องหลังไว้บนโลกออนไลน์ ผ่านรหัสเฉพาะของกล่องคุณเอง</p>
+  <div class="hero-actions">
+    <a href="create.html" class="btn btn-primary">เก็บความทรงจำของฉัน</a>
   </div>
-  <div class="hero-visual">
-    <div class="frame-box">
-      <div class="frame-inner">
-        <div class="slot"></div>
-        <div class="peek-card"><div class="stub-strip"></div></div>
-        <div class="peek-card"><div class="stub-strip"></div></div>
-        <div class="peek-card"><div class="stub-strip"></div></div>
-      </div>
-    </div>
-  </div>
+
+  <div id="heroBanner"><div id="bannerTrack"></div></div>
 </section>
 
 <div class="stats-bar">
   <div class="stats-row">
-    <div class="stat"><b id="statUsers">–</b><span>สมาชิกที่เก็บความทรงจำ</span></div>
-    <div class="stat"><b id="statItems">–</b><span>ความทรงจำทั้งหมด</span></div>
-    <div class="stat"><b id="statPublic">–</b><span>เปิดให้ทุกคนดูได้</span></div>
+    <div class="stat"><b id="statUsers">–</b><span>มีความทรงจำทั้งหมด(คน)</span></div>
+    <div class="stat"><b id="statItems">–</b><span>เรื่องราวทั้งหมด(ชิ้น)</span></div>
   </div>
+</div>
+
+<div class="category-summary">
+  <h3>หมวดความทรงจำ</h3>
+  <div class="category-pills" id="categoryPills"></div>
 </div>
 
 <div class="search-section" id="cards">
@@ -300,7 +264,6 @@
       <option value="not_specific">ไม่ระบุ</option>
       <option value="other">อื่นๆ</option>
     </select>
-    <select id="filterLocation"><option value="">จังหวัดทั้งหมด</option></select>
     <select id="filterMemoryType"><option value="">ประเภททั้งหมด</option></select>
     <input type="text" id="filterTag" placeholder="ค้นหาด้วย tag">
     <div class="view-toggle">
@@ -324,17 +287,18 @@
       <div>
         <div class="footer-logo wordmark"><span class="cap">M</span>eMorery</div>
         <p class="footer-tagline">พื้นที่เก็บความทรงจำจากกล่องของคุณ ให้ทุกของชิ้นเล็กมีเรื่องราวที่ตามหาเจอเสมอ</p>
-        <div class="social-row" style="margin-top:18px;">
-          <a href="https://www.tiktok.com/@memorery" target="_blank">TT</a>
-          <a href="#" target="_blank">LINE</a>
+        <div class="footer-social">
+          <a class="tiktok-icon" href="https://www.tiktok.com/@memorery" target="_blank" aria-label="TikTok">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M16.6 5.82c-1.02-.88-1.65-2.15-1.65-3.57h-3.13v14.1c0 1.57-1.28 2.85-2.85 2.85a2.85 2.85 0 0 1-2.85-2.85 2.85 2.85 0 0 1 2.85-2.85c.28 0 .55.04.8.12v-3.18a6.05 6.05 0 0 0-.8-.05A6 6 0 0 0 3 16.35a6 6 0 0 0 6 6 6 6 0 0 0 6-6V9.01a7.5 7.5 0 0 0 4.4 1.4V7.29a4.4 4.4 0 0 1-2.8-1.47z"/></svg>
+          </a>
+          <a class="line-btn" href="#" target="_blank">💬 ติดต่อทาง LINE</a>
         </div>
       </div>
       <div class="footer-links">
         <div class="footer-col">
           <h4>เมนู</h4>
           <a href="index.html">หน้าแรก</a>
-          <a href="create.html">สร้างโปรไฟล์</a>
-          <a href="edit.html">เข้าสู่ระบบ</a>
+          <a href="create.html">เก็บความทรงจำของฉัน</a>
         </div>
         <div class="footer-col">
           <h4>ข้อมูล</h4>
@@ -350,7 +314,7 @@
 
 <script>
   const CONFIG = {
-    API_URL: 'https://script.google.com/macros/s/AKfycbxlD0LwyG7Y6HS_dSZqPpy805SUwAwrA5f9sdYF49d7WRUvXlBXTX7SS_C0926eruFgpQ/exec' // วาง Web app URL จาก Apps Script deployment ตรงนี้
+    API_URL: 'YOUR_WEB_APP_EXEC_URL_HERE' // วาง Web app URL จาก Apps Script deployment ตรงนี้
   };
 
   const MEMORY_TYPES = [
@@ -363,14 +327,10 @@
     {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Other', emoji:'💡', label:'Other'}
   ];
 
-  const PROVINCES = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
-
   let allCards = [];
   let currentView = 'card';
 
   function initFilters(){
-    const locSel = document.getElementById('filterLocation');
-    PROVINCES.forEach(p => locSel.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
     const typeSel = document.getElementById('filterMemoryType');
     MEMORY_TYPES.forEach(t => typeSel.insertAdjacentHTML('beforeend', `<option value="${t.key}">${t.emoji} ${t.label}</option>`));
   }
@@ -380,7 +340,6 @@
       action: 'listCards',
       q: document.getElementById('searchInput').value,
       gender: document.getElementById('filterGender').value,
-      location: document.getElementById('filterLocation').value,
       memory_type: document.getElementById('filterMemoryType').value,
       tag: document.getElementById('filterTag').value
     });
@@ -390,17 +349,24 @@
       if(data.success){
         allCards = data.cards;
         renderCards();
-        updateStats();
+        updateStats(data);
+        renderCategoryPills(data.category_counts || {});
       }
     }catch(err){
       document.getElementById('cardsGrid').innerHTML = `<div class="empty-state">โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง</div>`;
     }
   }
 
-  function updateStats(){
-    document.getElementById('statUsers').textContent = allCards.length;
-    document.getElementById('statItems').textContent = allCards.reduce((sum,c)=>sum+(c.item_count||0),0);
-    document.getElementById('statPublic').textContent = allCards.filter(c=>c.item_count>0).length;
+  function updateStats(data){
+    document.getElementById('statUsers').textContent = data.total_users ?? allCards.length;
+    document.getElementById('statItems').textContent = data.total_items ?? allCards.reduce((sum,c)=>sum+(c.item_count||0),0);
+  }
+
+  function renderCategoryPills(counts){
+    const wrap = document.getElementById('categoryPills');
+    wrap.innerHTML = MEMORY_TYPES.map(t => `
+      <span class="category-pill">${t.emoji} ${t.label} <b>${counts[t.key] || 0}</b></span>
+    `).join('');
   }
 
   function renderCards(){
@@ -437,7 +403,7 @@
     });
   });
 
-  ['searchInput','filterGender','filterLocation','filterMemoryType','filterTag'].forEach(id=>{
+  ['searchInput','filterGender','filterMemoryType','filterTag'].forEach(id=>{
     const el = document.getElementById(id);
     el.addEventListener(el.tagName==='SELECT'?'change':'input', debounce(fetchCards, 350));
   });
@@ -454,8 +420,112 @@
     window.scrollTo({top:0, behavior:'smooth'});
   });
 
+  /* ===================== HERO BANNER — เหมือนโปรเจค findmyname เป๊ะ ===================== */
+  const heroBanner = document.getElementById('heroBanner');
+  const bannerTrack = document.getElementById('bannerTrack');
+  let bannerCount = 0, trackPosition = 0, loopWidth = 0, isDragging = false,
+      dragStartX = 0, dragStartPosition = 0, dragTraveled = 0, lastFrameTime = null;
+  const BANNER_SPEED_PX_PER_SEC = 40;
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // แปลงลิงก์ share ของ Google Drive ให้กลายเป็น URL ที่ใช้แสดงรูปได้จริง
+  function normalizeImageUrl(url){
+    if(!url) return '';
+    const m = String(url).match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if(m) return 'https://drive.google.com/uc?export=view&id=' + m[1];
+    const openMatch = String(url).match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if(openMatch) return 'https://drive.google.com/uc?export=view&id=' + openMatch[1];
+    return url;
+  }
+
+  async function loadBanners(){
+    try{
+      const res = await fetch(`${CONFIG.API_URL}?action=getBanners`);
+      const data = await res.json();
+      if(data.success && data.banners && data.banners.length > 0){
+        renderBanners(data.banners);
+        heroBanner.style.display = 'block';
+      }
+    }catch(err){ /* banner เป็นของตกแต่ง โหลดไม่ได้ก็ไม่ต้องแสดง error */ }
+  }
+
+  function renderBanners(banners){
+    bannerCount = banners.length;
+    const slides = bannerCount > 1 ? banners.concat(banners) : banners;
+    bannerTrack.innerHTML = slides.map(b => {
+      const clickable = b.link_url ? 'cursor:pointer' : 'cursor:default';
+      return `<div style="flex:0 0 100%;height:100%;${clickable}" data-link="${esc(b.link_url||'')}">
+        <img src="${esc(normalizeImageUrl(b.image_url))}" draggable="false"></div>`;
+    }).join('');
+    trackPosition = 0;
+    bannerTrack.style.transform = 'translateX(0px)';
+    attachBannerClicks();
+    setupBannerDrag();
+    if(bannerCount > 1){
+      heroBanner.style.cursor = 'grab';
+      lastFrameTime = null;
+      requestAnimationFrame(bannerFrame);
+    }
+  }
+
+  function attachBannerClicks(){
+    bannerTrack.querySelectorAll('div[data-link]').forEach(slide => {
+      slide.addEventListener('click', () => {
+        if(dragTraveled > 5) return;
+        const link = slide.getAttribute('data-link');
+        if(link) window.open(link, '_blank');
+      });
+    });
+  }
+
+  function bannerFrame(timestamp){
+    if(bannerCount <= 1) return;
+    if(lastFrameTime === null) lastFrameTime = timestamp;
+    const dt = (timestamp - lastFrameTime) / 1000;
+    lastFrameTime = timestamp;
+    if(!isDragging){
+      loopWidth = bannerTrack.scrollWidth / 2;
+      trackPosition -= BANNER_SPEED_PX_PER_SEC * dt;
+      if(trackPosition <= -loopWidth) trackPosition += loopWidth;
+      bannerTrack.style.transform = 'translateX(' + trackPosition + 'px)';
+    }
+    requestAnimationFrame(bannerFrame);
+  }
+
+  function setupBannerDrag(){
+    const onDown = (clientX) => {
+      if(bannerCount <= 1) return;
+      isDragging = true; dragTraveled = 0; dragStartX = clientX; dragStartPosition = trackPosition;
+      heroBanner.style.cursor = 'grabbing';
+    };
+    const onMove = (clientX) => {
+      if(!isDragging) return;
+      dragTraveled = Math.abs(clientX - dragStartX);
+      trackPosition = dragStartPosition + (clientX - dragStartX);
+      bannerTrack.style.transform = 'translateX(' + trackPosition + 'px)';
+    };
+    const onUp = () => {
+      if(!isDragging) return;
+      isDragging = false;
+      heroBanner.style.cursor = 'grab';
+      loopWidth = bannerTrack.scrollWidth / 2;
+      if(loopWidth > 0){
+        trackPosition = trackPosition % loopWidth;
+        if(trackPosition > 0) trackPosition -= loopWidth;
+      }
+    };
+    bannerTrack.addEventListener('touchstart', e => onDown(e.touches[0].clientX), {passive:true});
+    bannerTrack.addEventListener('touchmove', e => onMove(e.touches[0].clientX), {passive:true});
+    bannerTrack.addEventListener('touchend', onUp);
+    bannerTrack.addEventListener('mousedown', e => { e.preventDefault(); onDown(e.clientX); });
+    window.addEventListener('mousemove', e => onMove(e.clientX));
+    window.addEventListener('mouseup', onUp);
+  }
+
   initFilters();
   fetchCards();
+  loadBanners();
 </script>
 
 </body>
