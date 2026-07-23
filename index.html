@@ -241,8 +241,8 @@
 
 <div class="stats-bar">
   <div class="stats-row">
-    <div class="stat"><b id="statUsers">–</b><span>มีความทรงจำทั้งหมด(คน)</span></div>
-    <div class="stat"><b id="statItems">–</b><span>เรื่องราวทั้งหมด(ชิ้น)</span></div>
+    <div class="stat"><b id="statUsers">0</b><span>มีความทรงจำทั้งหมด(คน)</span></div>
+    <div class="stat"><b id="statItems">0</b><span>เรื่องราวทั้งหมด(ชิ้น)</span></div>
   </div>
 </div>
 
@@ -314,7 +314,7 @@
 
 <script>
   const CONFIG = {
-    API_URL: 'YOUR_WEB_APP_EXEC_URL_HERE' // วาง Web app URL จาก Apps Script deployment ตรงนี้
+    API_URL: 'https://script.google.com/macros/s/AKfycbxlD0LwyG7Y6HS_dSZqPpy805SUwAwrA5f9sdYF49d7WRUvXlBXTX7SS_C0926eruFgpQ/exec'
   };
 
   const MEMORY_TYPES = [
@@ -524,6 +524,7 @@
   }
 
   initFilters();
+  renderCategoryPills({}); // แสดงครบ 14 หมวดตั้งแต่แรก (เป็น 0 ก่อน) ไม่ต้องรอ fetch สำเร็จ
   fetchCards();
   loadBanners();
 </script>
