@@ -78,10 +78,40 @@
   .avatar-upload span{ font-size:13px; color:var(--text-soft); cursor:pointer; }
   .avatar-upload input[type="file"]{ display:none; }
   .upload-spinner{
-    position:absolute; inset:0; background:rgba(255,255,255,0.75);
-    display:none; align-items:center; justify-content:center; font-size:12px; color:var(--text-soft);
+    position:absolute; inset:0; background:rgba(255,255,255,0.85);
+    display:none; align-items:center; justify-content:center;
   }
   .upload-spinner.show{ display:flex; }
+  .spinner-ring{
+    width:26px; height:26px; border:3px solid rgba(130,46,42,0.15);
+    border-top-color:var(--primary); border-radius:50%;
+    animation:spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .btn .spinner-ring{ width:17px; height:17px; border-width:2.5px; border-top-color:#fff; }
+
+  /* ---------- Modal (item saved confirmation) ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(26,31,44,0.5);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:100; padding:0;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:var(--surface); border-radius:20px 20px 0 0;
+    padding:32px 24px 28px; width:100%; max-width:560px;
+    text-align:center; animation:slideUp .25s ease-out;
+  }
+  @keyframes slideUp{ from{ transform:translateY(30px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+  .modal-icon{
+    width:56px; height:56px; border-radius:50%; background:rgba(83,108,98,0.12);
+    color:var(--forest); font-size:28px; display:flex; align-items:center; justify-content:center;
+    margin:0 auto 16px;
+  }
+  .modal-box h3{ font-family:'Lexend',sans-serif; font-size:19px; margin-bottom:6px; }
+  .modal-box p{ font-size:14px; color:var(--text-soft); margin-bottom:22px; }
+  .modal-box .btn-outline{ margin-top:10px; }
 
   /* ---------- Gender pills ---------- */
   .pill-group{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
@@ -172,8 +202,9 @@
 
       <div class="avatar-upload">
         <div class="avatar-preview" id="avatarPreview">
-          <span class="plus">＋</span>
-          <div class="upload-spinner" id="avatarSpinner">กำลังอัปโหลด...</div>
+          <span class="plus" id="avatarPlus">＋</span>
+          <img id="avatarImg" style="display:none;">
+          <div class="upload-spinner" id="avatarSpinner"><div class="spinner-ring"></div></div>
         </div>
         <span onclick="document.getElementById('avatarFile').click()">เพิ่มรูปโปรไฟล์</span>
         <input type="file" id="avatarFile" accept="image/*">
@@ -238,8 +269,10 @@
 
       <label>รูปของชิ้นนี้</label>
       <div class="item-image-upload" id="itemImagePreview">
-        <span class="plus">＋</span>
-        <span>เพิ่มรูปภาพ</span>
+        <span class="plus" id="itemImagePlus">＋</span>
+        <span id="itemImageLabel">เพิ่มรูปภาพ</span>
+        <img id="itemImg" style="display:none;">
+        <div class="upload-spinner" id="itemImageSpinner"><div class="spinner-ring"></div></div>
         <input type="file" id="itemFile" accept="image/*">
       </div>
 
@@ -270,10 +303,21 @@
         </label>
       </div>
 
-      <button class="btn btn-primary" id="btnAddItem">บันทึกความทรงจำนี้</button>
+      <button class="btn btn-primary" id="btnAddItem">
+        <span id="btnAddItemText">บันทึกความทรงจำนี้</span>
+      </button>
     </div>
+  </div>
+</div>
 
-    <button class="btn btn-outline" id="btnFinish">เสร็จแล้ว ไปที่โปรไฟล์ของฉัน →</button>
+<!-- ===================== MODAL: บันทึกสำเร็จ ===================== -->
+<div class="modal-overlay" id="itemSavedModal">
+  <div class="modal-box">
+    <div class="modal-icon">✓</div>
+    <h3>บันทึกความทรงจำนี้แล้ว</h3>
+    <p>เก็บไปแล้วทั้งหมด <b id="modalCount">1</b> ชิ้น</p>
+    <button class="btn btn-primary" id="modalGoProfile">ไปที่โปรไฟล์ของฉัน</button>
+    <button class="btn btn-outline" id="modalAddMore">เพิ่มอีกชิ้น</button>
   </div>
 </div>
 
@@ -406,16 +450,28 @@
   document.getElementById('avatarFile').addEventListener('change', async function(){
     const file = this.files[0];
     if(!file) return;
-    const preview = document.getElementById('avatarPreview');
+    const plus = document.getElementById('avatarPlus');
+    const img = document.getElementById('avatarImg');
     const spinner = document.getElementById('avatarSpinner');
+    plus.style.display = 'none';
     spinner.classList.add('show');
     try{
       const url = await uploadImageFile(file);
       profileImageUrl = url;
-      preview.innerHTML = `<img src="${url}"><div class="upload-spinner" id="avatarSpinner">กำลังอัปโหลด...</div>`;
+      img.src = url;
+      img.style.display = 'block';
     }catch(err){
       showMsg('profileMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      if(!profileImageUrl) plus.style.display = 'block';
     }
+    spinner.classList.remove('show');
+  });
+
+  // มือถือมัก auto-capitalize ตัวแรก บังคับเป็นตัวเล็กเสมอ กัน login ไม่เข้าเพราะตัวพิมพ์ไม่ตรงกัน
+  document.getElementById('usernameInput').addEventListener('input', function(){
+    const pos = this.selectionStart;
+    this.value = this.value.toLowerCase();
+    this.setSelectionRange(pos, pos);
   });
 
   let itemImageUrl = '';
@@ -423,16 +479,23 @@
   document.getElementById('itemFile').addEventListener('change', async function(){
     const file = this.files[0];
     if(!file) return;
-    const preview = document.getElementById('itemImagePreview');
-    preview.innerHTML = `<span>กำลังอัปโหลด...</span>`;
+    const plus = document.getElementById('itemImagePlus');
+    const label = document.getElementById('itemImageLabel');
+    const img = document.getElementById('itemImg');
+    const spinner = document.getElementById('itemImageSpinner');
+    plus.style.display = 'none';
+    label.style.display = 'none';
+    spinner.classList.add('show');
     try{
       const url = await uploadImageFile(file);
       itemImageUrl = url;
-      preview.innerHTML = `<img src="${url}">`;
+      img.src = url;
+      img.style.display = 'block';
     }catch(err){
-      preview.innerHTML = `<span class="plus">＋</span><span>เพิ่มรูปภาพ</span>`;
       showMsg('itemMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      if(!itemImageUrl){ plus.style.display = 'block'; label.style.display = 'block'; }
     }
+    spinner.classList.remove('show');
   });
 
   // ===================== STEP 1: CHECK BOX CODE =====================
@@ -444,6 +507,11 @@
     const code = document.getElementById('boxCodeInput').value.trim();
     clearMsg('codeMsg');
     if(!code){ showMsg('codeMsg', 'กรุณากรอก box code', 'error'); return; }
+
+    const btn = document.getElementById('btnCheckCode');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner-ring"></div>';
 
     try{
       const res = await fetch(`${CONFIG.API_URL}?action=checkBoxCode&code=${encodeURIComponent(code)}`);
@@ -457,6 +525,8 @@
     }catch(err){
       showMsg('codeMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
     }
+    btn.disabled = false;
+    btn.textContent = originalText;
   });
 
   // ถ้ามาจากการสแกน QR (?code=XXXXXXXX) กรอกให้อัตโนมัติ + เช็คให้เลย
@@ -477,7 +547,8 @@
     if(!selectedGender){ showMsg('profileMsg', 'กรุณาเลือกเพศ', 'error'); return; }
 
     const btn = document.getElementById('btnCreateProfile');
-    btn.disabled = true; btn.textContent = 'กำลังสร้างโปรไฟล์...';
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
 
     const body = {
       action: 'signup',
@@ -509,11 +580,11 @@
         showStep(3);
       }else{
         showMsg('profileMsg', data.message || 'สร้างโปรไฟล์ไม่สำเร็จ', 'error');
-        btn.disabled = false; btn.textContent = 'สร้างโปรไฟล์';
+        btn.disabled = false; btn.textContent = originalText;
       }
     }catch(err){
       showMsg('profileMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
-      btn.disabled = false; btn.textContent = 'สร้างโปรไฟล์';
+      btn.disabled = false; btn.textContent = originalText;
     }
   });
 
@@ -527,7 +598,7 @@
     if(tags.length === 0){ showMsg('itemMsg', 'กรุณากรอก Tag อย่างน้อย 1 อัน', 'error'); return; }
 
     const btn = document.getElementById('btnAddItem');
-    btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
 
     const body = {
       action: 'createItem',
@@ -548,14 +619,23 @@
         itemCount++;
         addToList(itemImageUrl, Array.from(selectedTypes), tags);
         resetItemForm();
-        showMsg('itemMsg', 'บันทึกความทรงจำนี้แล้ว ✓', 'success');
+        document.getElementById('modalCount').textContent = itemCount;
+        document.getElementById('itemSavedModal').classList.add('show');
       }else{
         showMsg('itemMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
       }
     }catch(err){
       showMsg('itemMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
     }
-    btn.disabled = false; btn.textContent = 'บันทึกความทรงจำนี้';
+    btn.disabled = false; btn.innerHTML = '<span id="btnAddItemText">บันทึกความทรงจำนี้</span>';
+  });
+
+  document.getElementById('modalGoProfile').addEventListener('click', () => {
+    location.href = `profile.html?user_id=${session.user_id}`;
+  });
+  document.getElementById('modalAddMore').addEventListener('click', () => {
+    document.getElementById('itemSavedModal').classList.remove('show');
+    window.scrollTo({top:0, behavior:'smooth'});
   });
 
   function addToList(image, types, tags){
@@ -575,7 +655,11 @@
 
   function resetItemForm(){
     itemImageUrl = '';
-    document.getElementById('itemImagePreview').innerHTML = `<span class="plus">＋</span><span>เพิ่มรูปภาพ</span>`;
+    document.getElementById('itemImagePlus').style.display = 'block';
+    document.getElementById('itemImageLabel').style.display = 'block';
+    const img = document.getElementById('itemImg');
+    img.style.display = 'none';
+    img.src = '';
     selectedTypes.clear();
     document.querySelectorAll('#typeGrid .type-pill').forEach(p => p.classList.remove('selected'));
     document.getElementById('descriptionInput').value = '';
@@ -583,9 +667,6 @@
     document.getElementById('itemIsPublicInput').checked = true;
   }
 
-  document.getElementById('btnFinish').addEventListener('click', () => {
-    location.href = `profile.html?user_id=${session.user_id}`;
-  });
 
   initProvinces();
   initGenderPills();
