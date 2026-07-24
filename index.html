@@ -85,10 +85,21 @@
     margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw);
     margin-bottom:32px;
     overflow:hidden; position:relative;
-    aspect-ratio:2.4/1; display:none;
+    aspect-ratio:2.4/1; max-height:280px; display:none;
   }
   #bannerTrack{ display:flex; width:100%; height:100%; touch-action:pan-y; cursor:grab; }
   #bannerTrack img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+
+  /* จอคอม/แท็บเล็ตแนวนอน: เลิกเบ่งเต็มจอ ให้อยู่ในกรอบ max-width เดียวกับ content
+     + สัดส่วนแบนลง + มี max-height กันสูงบ้าคลั่งตอนจอกว้าง */
+  @media(min-width:768px){
+    #heroBanner{
+      width:100%; max-width:1240px;
+      margin-left:auto; margin-right:auto;
+      aspect-ratio:3.6/1; max-height:260px;
+      border-radius:var(--radius);
+    }
+  }
 
   /* ---------- STATS ---------- */
   .stats-bar{
@@ -462,7 +473,6 @@
     }).join('');
     trackPosition = 0;
     bannerTrack.style.transform = 'translateX(0px)';
-    attachBannerClicks();
     setupBannerDrag();
     if(bannerCount > 1){
       heroBanner.style.cursor = 'grab';
@@ -480,16 +490,6 @@
     return 'https://' + trimmed;
   }
 
-  function attachBannerClicks(){
-    bannerTrack.querySelectorAll('div[data-link]').forEach(slide => {
-      slide.addEventListener('click', () => {
-        if(dragTraveled > 5) return;
-        const link = slide.getAttribute('data-link');
-        if(link) window.open(normalizeLink(link), '_blank');
-      });
-    });
-  }
-
   function bannerFrame(timestamp){
     if(bannerCount <= 1) return;
     if(lastFrameTime === null) lastFrameTime = timestamp;
@@ -504,14 +504,15 @@
     requestAnimationFrame(bannerFrame);
   }
 
+  let downSlide = null; // ชิ้น slide ที่โดนกดตอน pointerdown (เก็บไว้ก่อน setPointerCapture จะ retarget event)
+
   function setupBannerDrag(){
-    const onDown = (clientX, pointerId) => {
+    const onDown = (e) => {
       if(bannerCount <= 1) return;
-      isDragging = true; dragTraveled = 0; dragStartX = clientX; dragStartPosition = trackPosition;
+      isDragging = true; dragTraveled = 0; dragStartX = e.clientX; dragStartPosition = trackPosition;
+      downSlide = e.target.closest('div[data-link]');
       heroBanner.style.cursor = 'grabbing';
-      if(pointerId !== undefined){
-        try{ bannerTrack.setPointerCapture(pointerId); }catch(e){}
-      }
+      try{ bannerTrack.setPointerCapture(e.pointerId); }catch(err){}
     };
     const onMove = (clientX) => {
       if(!isDragging) return;
@@ -528,11 +529,19 @@
         trackPosition = trackPosition % loopWidth;
         if(trackPosition > 0) trackPosition -= loopWidth;
       }
+      // ทำ "คลิก" เองแทนการพึ่ง native click event เพราะ setPointerCapture ทำให้
+      // mouseup/click ของเบราว์เซอร์ถูก retarget ไปที่ bannerTrack แทนตัว slide จริง
+      // (บนจอคอมกับเมาส์เจอปัญหานี้ แต่บนมือถือ tap->click เบราว์เซอร์สร้างจากตำแหน่งแตะเลย เลยไม่โดน)
+      if(dragTraveled <= 5 && downSlide){
+        const link = downSlide.getAttribute('data-link');
+        if(link) window.open(normalizeLink(link), '_blank');
+      }
+      downSlide = null;
     };
     // Pointer Events รวม touch/mouse/pen เป็นชุดเดียว
     // ฟัง pointermove/pointerup ที่ window (ไม่ใช่แค่ตัว bannerTrack) เพื่อให้ลากต่อได้แม้นิ้วจะเลื่อนหลุดขอบ banner ไปแล้ว
     // ไม่ใช้ pointerleave เพราะมันสั่งหยุดลากทันทีที่นิ้วเบี้ยวออกนอกกรอบนิดเดียว ทำให้ลากติดๆ ขัดๆ
-    bannerTrack.addEventListener('pointerdown', e => onDown(e.clientX, e.pointerId));
+    bannerTrack.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', e => onMove(e.clientX));
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
