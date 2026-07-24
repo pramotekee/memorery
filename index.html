@@ -529,12 +529,13 @@
         if(trackPosition > 0) trackPosition -= loopWidth;
       }
     };
-    // Pointer Events รวม touch/mouse/pen เป็นชุดเดียว กันปัญหาลากติดๆ ขัดๆ บนอุปกรณ์จอสัมผัส
+    // Pointer Events รวม touch/mouse/pen เป็นชุดเดียว
+    // ฟัง pointermove/pointerup ที่ window (ไม่ใช่แค่ตัว bannerTrack) เพื่อให้ลากต่อได้แม้นิ้วจะเลื่อนหลุดขอบ banner ไปแล้ว
+    // ไม่ใช้ pointerleave เพราะมันสั่งหยุดลากทันทีที่นิ้วเบี้ยวออกนอกกรอบนิดเดียว ทำให้ลากติดๆ ขัดๆ
     bannerTrack.addEventListener('pointerdown', e => onDown(e.clientX, e.pointerId));
-    bannerTrack.addEventListener('pointermove', e => onMove(e.clientX));
-    bannerTrack.addEventListener('pointerup', onUp);
-    bannerTrack.addEventListener('pointercancel', onUp);
-    bannerTrack.addEventListener('pointerleave', onUp);
+    window.addEventListener('pointermove', e => onMove(e.clientX));
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   }
 
   initFilters();
