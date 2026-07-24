@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เก็บความทรงจำของฉัน — MeMorery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F1EE; --surface:#FFFDFB; --text:#1A1F2C; --text-soft:#5B5750;
+    --primary:#822E2A; --primary-dark:#631F1C; --accent:#AD9461;
+    --muted:#AB9E91; --forest:#536C62; --border:#E5DED4;
+    --danger:#B3261E; --radius:16px;
+    --shadow:0 8px 24px rgba(26,31,44,0.06); --shadow-hover:0 16px 40px rgba(26,31,44,0.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6; }
+  .wordmark{ font-family:'Lexend',sans-serif; font-weight:800; }
+  .wordmark .cap{ font-size:1.15em; color:var(--primary); }
+  a{ color:inherit; }
+  header{ padding:20px 24px; }
+  .logo{ font-size:22px; }
+
+  .wrap{ max-width:560px; margin:0 auto; padding:8px 20px 100px; }
+
+  .step-indicator{ display:flex; gap:8px; margin-bottom:28px; }
+  .step-dot{ flex:1; height:4px; border-radius:99px; background:var(--border); }
+  .step-dot.active{ background:var(--primary); }
+  .step-dot.done{ background:var(--accent); }
+
+  h1.page-title{ font-family:'Lexend',sans-serif; font-size:26px; margin-bottom:8px; }
+  .page-sub{ color:var(--text-soft); font-size:14.5px; margin-bottom:28px; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); margin-bottom:20px; }
+
+  label{ display:block; font-size:13.5px; font-weight:600; color:var(--text-soft); margin-bottom:7px; }
+  input[type="text"], input[type="date"], select, textarea{
+    width:100%; border:1px solid var(--border); background:var(--bg);
+    border-radius:10px; padding:12px 14px; font-family:'Inter',sans-serif;
+    font-size:15px; color:var(--text); margin-bottom:18px; outline:none;
+    transition:border-color .15s;
+  }
+  input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
+  textarea{ resize:vertical; min-height:90px; }
+  .field-hint{ font-size:12px; color:var(--muted); margin-top:-13px; margin-bottom:16px; text-align:right; }
+
+  .code-input{
+    font-family:'Lexend',sans-serif; font-weight:700; font-size:24px;
+    letter-spacing:0.15em; text-align:center; text-transform:uppercase;
+  }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:14px 24px; border-radius:999px;
+    font-size:15px; font-weight:700; cursor:pointer; border:none;
+    transition:all .2s;
+  }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-dark); }
+  .btn-primary:disabled{ background:var(--muted); cursor:not-allowed; }
+  .btn-outline{ background:transparent; border:1.5px solid var(--border); color:var(--text); margin-top:10px; }
+  .btn-outline:hover{ border-color:var(--primary); color:var(--primary); }
+
+  .msg{ font-size:13.5px; padding:12px 14px; border-radius:10px; margin-bottom:16px; display:none; }
+  .msg.error{ background:rgba(179,38,30,0.08); color:var(--danger); display:block; }
+  .msg.success{ background:rgba(83,108,98,0.1); color:var(--forest); display:block; }
+
+  /* ---------- Profile image upload ---------- */
+  .avatar-upload{ display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
+  .avatar-preview{
+    width:96px; height:96px; border-radius:50%; background:var(--bg);
+    border:2px dashed var(--border); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; margin-bottom:10px; cursor:pointer; position:relative;
+  }
+  .avatar-preview img{ width:100%; height:100%; object-fit:cover; }
+  .avatar-preview .plus{ font-size:26px; color:var(--muted); }
+  .avatar-upload span{ font-size:13px; color:var(--text-soft); cursor:pointer; }
+  .avatar-upload input[type="file"]{ display:none; }
+  .upload-spinner{
+    position:absolute; inset:0; background:rgba(255,255,255,0.75);
+    display:none; align-items:center; justify-content:center; font-size:12px; color:var(--text-soft);
+  }
+  .upload-spinner.show{ display:flex; }
+
+  /* ---------- Gender pills ---------- */
+  .pill-group{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .pill-option{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:999px;
+    padding:9px 16px; font-size:13.5px; cursor:pointer; user-select:none; transition:all .15s;
+  }
+  .pill-option.selected{ background:var(--primary); border-color:var(--primary); color:#fff; }
+
+  /* ---------- Memory type multi-select ---------- */
+  .type-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .type-pill{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:999px;
+    padding:9px 14px; font-size:13.5px; cursor:pointer; user-select:none; transition:all .15s;
+  }
+  .type-pill.selected{ background:var(--forest); border-color:var(--forest); color:#fff; }
+
+  /* ---------- Item image upload (rectangular) ---------- */
+  .item-image-upload{
+    width:100%; aspect-ratio:1.4/1; border-radius:12px; background:var(--bg);
+    border:2px dashed var(--border); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; margin-bottom:18px; cursor:pointer; position:relative; flex-direction:column; gap:6px;
+  }
+  .item-image-upload img{ width:100%; height:100%; object-fit:cover; }
+  .item-image-upload .plus{ font-size:30px; color:var(--muted); }
+  .item-image-upload span{ font-size:13px; color:var(--text-soft); }
+  .item-image-upload input[type="file"]{ display:none; }
+
+  .tag-row{ display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:8px; margin-bottom:8px; }
+  .tag-row input{ margin-bottom:0; font-size:13.5px; padding:10px; }
+
+  /* ---------- Toggle switch ---------- */
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .toggle-row .toggle-label{ font-size:14px; color:var(--text); font-weight:500; }
+  .toggle-row .toggle-desc{ font-size:12.5px; color:var(--text-soft); margin-top:2px; }
+  .switch{ position:relative; width:46px; height:26px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer; transition:.2s; }
+  .slider::before{ content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .slider{ background:var(--forest); }
+  .switch input:checked + .slider::before{ transform:translateX(20px); }
+
+  /* ---------- Added items list ---------- */
+  .added-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .added-item{ display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; }
+  .added-item img{ width:44px; height:44px; border-radius:8px; object-fit:cover; background:var(--bg); }
+  .added-item .info{ flex:1; }
+  .added-item .info b{ font-size:13.5px; display:block; }
+  .added-item .info span{ font-size:12px; color:var(--text-soft); }
+
+  .counter-badge{
+    display:inline-block; background:rgba(130,46,42,0.08); color:var(--primary);
+    font-size:12.5px; font-weight:700; padding:4px 12px; border-radius:999px; margin-bottom:16px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo wordmark"><span class="cap">M</span>eMorery</a>
+</header>
+
+<div class="wrap">
+  <div class="step-indicator">
+    <div class="step-dot" id="dot1"></div>
+    <div class="step-dot" id="dot2"></div>
+    <div class="step-dot" id="dot3"></div>
+  </div>
+
+  <!-- ===================== SCREEN 1: BOX CODE ===================== -->
+  <div id="screenCode">
+    <h1 class="page-title">กรอกรหัสกล่องของคุณ</h1>
+    <p class="page-sub">รหัส 8 หลักที่แปะอยู่หลังกล่อง MeMorery ของคุณ</p>
+    <div class="card">
+      <div class="msg" id="codeMsg"></div>
+      <label>Box Code</label>
+      <input type="text" id="boxCodeInput" class="code-input" maxlength="8" placeholder="7K4M92FQ">
+      <button class="btn btn-primary" id="btnCheckCode">ตรวจสอบรหัส</button>
+    </div>
+  </div>
+
+  <!-- ===================== SCREEN 2: PROFILE FORM ===================== -->
+  <div id="screenProfile" style="display:none;">
+    <h1 class="page-title">สร้างโปรไฟล์ของคุณ</h1>
+    <p class="page-sub">ใช้ username และรหัสกล่องนี้เข้าสู่ระบบครั้งต่อไปได้เลย</p>
+    <div class="card">
+      <div class="msg" id="profileMsg"></div>
+
+      <div class="avatar-upload">
+        <div class="avatar-preview" id="avatarPreview">
+          <span class="plus">＋</span>
+          <div class="upload-spinner" id="avatarSpinner">กำลังอัปโหลด...</div>
+        </div>
+        <span onclick="document.getElementById('avatarFile').click()">เพิ่มรูปโปรไฟล์</span>
+        <input type="file" id="avatarFile" accept="image/*">
+      </div>
+
+      <label>Username *</label>
+      <input type="text" id="usernameInput" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
+
+      <label>วันเกิด</label>
+      <input type="date" id="birthdayInput">
+      <div class="field-hint" id="ageDisplay"></div>
+
+      <label>เพศ</label>
+      <div class="pill-group" id="genderPills">
+        <div class="pill-option" data-value="male">ชาย</div>
+        <div class="pill-option" data-value="female">หญิง</div>
+        <div class="pill-option" data-value="not_specific">ไม่ระบุ</div>
+        <div class="pill-option" data-value="other">อื่นๆ</div>
+      </div>
+      <input type="text" id="genderOtherInput" placeholder="ระบุเพศของคุณ" style="display:none;">
+
+      <label>จังหวัด</label>
+      <select id="locationInput"><option value="">เลือกจังหวัด</option></select>
+
+      <label>About me</label>
+      <textarea id="aboutMeInput" maxlength="200" placeholder="เล่าเกี่ยวกับตัวคุณสั้นๆ..."></textarea>
+      <div class="field-hint"><span id="aboutMeCount">0</span>/200</div>
+
+      <label>ช่องทางติดต่อ (ใส่หรือไม่ใส่ก็ได้)</label>
+      <input type="text" id="lineInput" placeholder="ลิงก์ LINE">
+      <input type="text" id="facebookInput" placeholder="ลิงก์ Facebook">
+      <input type="text" id="tiktokInput" placeholder="username TikTok (ไม่ต้องใส่ @)">
+      <input type="text" id="instagramInput" placeholder="username Instagram (ไม่ต้องใส่ @)">
+      <input type="text" id="youtubeInput" placeholder="ลิงก์ YouTube">
+      <input type="text" id="xInput" placeholder="username X (ไม่ต้องใส่ @)">
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">เปิดโปรไฟล์สาธารณะ</div>
+          <div class="toggle-desc">คนอื่นค้นหาและดูโปรไฟล์คุณได้</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="isPublicInput" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="btn btn-primary" id="btnCreateProfile">สร้างโปรไฟล์</button>
+    </div>
+  </div>
+
+  <!-- ===================== SCREEN 3: ADD ITEMS ===================== -->
+  <div id="screenItems" style="display:none;">
+    <h1 class="page-title">หย่อนความทรงจำชิ้นแรก</h1>
+    <p class="page-sub">เพิ่มได้เรื่อยๆ ทีละชิ้น เสร็จแล้วกดไปที่โปรไฟล์ได้เลย</p>
+
+    <div class="added-list" id="addedList"></div>
+    <div class="counter-badge" id="itemCounter" style="display:none;"></div>
+
+    <div class="card">
+      <div class="msg" id="itemMsg"></div>
+
+      <label>รูปของชิ้นนี้</label>
+      <div class="item-image-upload" id="itemImagePreview">
+        <span class="plus">＋</span>
+        <span>เพิ่มรูปภาพ</span>
+        <input type="file" id="itemFile" accept="image/*">
+      </div>
+
+      <label>Memory Type (เลือกได้หลายอัน)</label>
+      <div class="type-grid" id="typeGrid"></div>
+
+      <label>เล่าความรู้สึก / เรื่องราวของชิ้นนี้</label>
+      <textarea id="descriptionInput" placeholder="เกิดอะไรขึ้นตอนนั้น รู้สึกยังไง..."></textarea>
+
+      <label>Tag (อย่างน้อย 1 อัน)</label>
+      <div class="tag-row">
+        <input type="text" class="tag-input" placeholder="tag 1">
+        <input type="text" class="tag-input" placeholder="tag 2">
+        <input type="text" class="tag-input" placeholder="tag 3">
+        <input type="text" class="tag-input" placeholder="tag 4">
+        <input type="text" class="tag-input" placeholder="tag 5">
+      </div>
+      <div style="height:18px;"></div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">แสดงชิ้นนี้แบบสาธารณะ</div>
+          <div class="toggle-desc">คนอื่นเห็นชิ้นนี้ได้ถ้าโปรไฟล์เปิดสาธารณะด้วย</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="itemIsPublicInput" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="btn btn-primary" id="btnAddItem">บันทึกความทรงจำนี้</button>
+    </div>
+
+    <button class="btn btn-outline" id="btnFinish">เสร็จแล้ว ไปที่โปรไฟล์ของฉัน →</button>
+  </div>
+</div>
+
+<script>
+  const CONFIG = {
+    API_URL: 'https://script.google.com/macros/s/AKfycbxlD0LwyG7Y6HS_dSZqPpy805SUwAwrA5f9sdYF49d7WRUvXlBXTX7SS_C0926eruFgpQ/exec'
+  };
+
+  const PROVINCES = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+
+  const MEMORY_TYPES = [
+    {key:'Love', emoji:'❤️', label:'Love'}, {key:'Family', emoji:'👨‍👩‍👧', label:'Family'},
+    {key:'Friends', emoji:'🤝', label:'Friends'}, {key:'Travel', emoji:'✈️', label:'Travel'},
+    {key:'Entertainment', emoji:'🎭', label:'Entertainment'}, {key:'Learning', emoji:'📚', label:'Learning'},
+    {key:'Career', emoji:'💼', label:'Career'}, {key:'Health', emoji:'🏃', label:'Health'},
+    {key:'Pets', emoji:'🐶', label:'Pets'}, {key:'Nature', emoji:'🌱', label:'Nature'},
+    {key:'Giving', emoji:'🙏', label:'Giving'}, {key:'Celebration', emoji:'🎉', label:'Celebration'},
+    {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Other', emoji:'💡', label:'Other'}
+  ];
+
+  // ===================== STATE (เก็บไว้ใน memory เท่านั้น ไม่แตะ localStorage) =====================
+  let session = { box_code:'', username:'', user_id:'' };
+  let selectedGender = '';
+  let selectedTypes = new Set();
+  let itemCount = 0;
+
+  function showStep(n){
+    document.getElementById('screenCode').style.display = n===1 ? 'block' : 'none';
+    document.getElementById('screenProfile').style.display = n===2 ? 'block' : 'none';
+    document.getElementById('screenItems').style.display = n===3 ? 'block' : 'none';
+    ['dot1','dot2','dot3'].forEach((id,i)=>{
+      const el = document.getElementById(id);
+      el.className = 'step-dot' + (i+1 < n ? ' done' : (i+1 === n ? ' active' : ''));
+    });
+  }
+
+  function showMsg(id, text, type){
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+  function clearMsg(id){
+    const el = document.getElementById(id);
+    el.className = 'msg';
+  }
+
+  // ===================== INIT FIELDS =====================
+  function initProvinces(){
+    const sel = document.getElementById('locationInput');
+    PROVINCES.forEach(p => sel.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
+  }
+  function initGenderPills(){
+    document.querySelectorAll('#genderPills .pill-option').forEach(p => {
+      p.addEventListener('click', () => {
+        document.querySelectorAll('#genderPills .pill-option').forEach(x=>x.classList.remove('selected'));
+        p.classList.add('selected');
+        selectedGender = p.dataset.value;
+        document.getElementById('genderOtherInput').style.display = selectedGender === 'other' ? 'block' : 'none';
+      });
+    });
+  }
+  function initMemoryTypes(){
+    const grid = document.getElementById('typeGrid');
+    MEMORY_TYPES.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'type-pill';
+      el.textContent = `${t.emoji} ${t.label}`;
+      el.dataset.key = t.key;
+      el.addEventListener('click', () => {
+        if(selectedTypes.has(t.key)){ selectedTypes.delete(t.key); el.classList.remove('selected'); }
+        else{ selectedTypes.add(t.key); el.classList.add('selected'); }
+      });
+      grid.appendChild(el);
+    });
+  }
+  document.getElementById('birthdayInput').addEventListener('change', function(){
+    if(!this.value){ document.getElementById('ageDisplay').textContent = ''; return; }
+    const birth = new Date(this.value);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if(m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    document.getElementById('ageDisplay').textContent = `อายุ ${age} ปี`;
+  });
+  document.getElementById('aboutMeInput').addEventListener('input', function(){
+    document.getElementById('aboutMeCount').textContent = this.value.length;
+  });
+
+  // ===================== IMAGE UPLOAD (resize -> base64 -> upload -> url) =====================
+  function resizeImageFile(file, maxWidth){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxWidth / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadImageFile(file){
+    const base64 = await resizeImageFile(file, 1500);
+    const res = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'uploadImage',
+        image_base64: base64,
+        mime_type: 'image/jpeg',
+        file_name: 'memorery_' + Date.now() + '.jpg'
+      })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message || 'อัปโหลดรูปไม่สำเร็จ');
+    return data.url;
+  }
+
+  let profileImageUrl = '';
+  document.getElementById('avatarPreview').addEventListener('click', () => document.getElementById('avatarFile').click());
+  document.getElementById('avatarFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    if(!file) return;
+    const preview = document.getElementById('avatarPreview');
+    const spinner = document.getElementById('avatarSpinner');
+    spinner.classList.add('show');
+    try{
+      const url = await uploadImageFile(file);
+      profileImageUrl = url;
+      preview.innerHTML = `<img src="${url}"><div class="upload-spinner" id="avatarSpinner">กำลังอัปโหลด...</div>`;
+    }catch(err){
+      showMsg('profileMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+  });
+
+  let itemImageUrl = '';
+  document.getElementById('itemImagePreview').addEventListener('click', () => document.getElementById('itemFile').click());
+  document.getElementById('itemFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    if(!file) return;
+    const preview = document.getElementById('itemImagePreview');
+    preview.innerHTML = `<span>กำลังอัปโหลด...</span>`;
+    try{
+      const url = await uploadImageFile(file);
+      itemImageUrl = url;
+      preview.innerHTML = `<img src="${url}">`;
+    }catch(err){
+      preview.innerHTML = `<span class="plus">＋</span><span>เพิ่มรูปภาพ</span>`;
+      showMsg('itemMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+  });
+
+  // ===================== STEP 1: CHECK BOX CODE =====================
+  document.getElementById('boxCodeInput').addEventListener('input', function(){
+    this.value = this.value.toUpperCase();
+  });
+
+  document.getElementById('btnCheckCode').addEventListener('click', async () => {
+    const code = document.getElementById('boxCodeInput').value.trim();
+    clearMsg('codeMsg');
+    if(!code){ showMsg('codeMsg', 'กรุณากรอก box code', 'error'); return; }
+
+    try{
+      const res = await fetch(`${CONFIG.API_URL}?action=checkBoxCode&code=${encodeURIComponent(code)}`);
+      const data = await res.json();
+      if(data.valid){
+        session.box_code = code;
+        showStep(2);
+      }else{
+        showMsg('codeMsg', data.message || 'รหัสไม่ถูกต้อง', 'error');
+      }
+    }catch(err){
+      showMsg('codeMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+  });
+
+  // ถ้ามาจากการสแกน QR (?code=XXXXXXXX) กรอกให้อัตโนมัติ + เช็คให้เลย
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(location.search);
+    const codeFromQr = params.get('code');
+    if(codeFromQr){
+      document.getElementById('boxCodeInput').value = codeFromQr.toUpperCase();
+      document.getElementById('btnCheckCode').click();
+    }
+  });
+
+  // ===================== STEP 2: CREATE PROFILE =====================
+  document.getElementById('btnCreateProfile').addEventListener('click', async () => {
+    clearMsg('profileMsg');
+    const username = document.getElementById('usernameInput').value.trim();
+    if(!username){ showMsg('profileMsg', 'กรุณากรอก username', 'error'); return; }
+    if(!selectedGender){ showMsg('profileMsg', 'กรุณาเลือกเพศ', 'error'); return; }
+
+    const btn = document.getElementById('btnCreateProfile');
+    btn.disabled = true; btn.textContent = 'กำลังสร้างโปรไฟล์...';
+
+    const body = {
+      action: 'signup',
+      box_code: session.box_code,
+      username,
+      profile_image: profileImageUrl,
+      birthday: document.getElementById('birthdayInput').value,
+      gender: selectedGender,
+      gender_other: document.getElementById('genderOtherInput').value.trim(),
+      location: document.getElementById('locationInput').value,
+      about_me: document.getElementById('aboutMeInput').value.trim(),
+      socials: {
+        line: document.getElementById('lineInput').value.trim(),
+        facebook: document.getElementById('facebookInput').value.trim(),
+        tiktok: document.getElementById('tiktokInput').value.trim().replace('@',''),
+        instagram: document.getElementById('instagramInput').value.trim().replace('@',''),
+        youtube: document.getElementById('youtubeInput').value.trim(),
+        x: document.getElementById('xInput').value.trim().replace('@','')
+      },
+      is_public: document.getElementById('isPublicInput').checked
+    };
+
+    try{
+      const res = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify(body) });
+      const data = await res.json();
+      if(data.success){
+        session.username = username;
+        session.user_id = data.user_id;
+        showStep(3);
+      }else{
+        showMsg('profileMsg', data.message || 'สร้างโปรไฟล์ไม่สำเร็จ', 'error');
+        btn.disabled = false; btn.textContent = 'สร้างโปรไฟล์';
+      }
+    }catch(err){
+      showMsg('profileMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      btn.disabled = false; btn.textContent = 'สร้างโปรไฟล์';
+    }
+  });
+
+  // ===================== STEP 3: ADD ITEM (ทำซ้ำได้) =====================
+  document.getElementById('btnAddItem').addEventListener('click', async () => {
+    clearMsg('itemMsg');
+    const tags = Array.from(document.querySelectorAll('.tag-input')).map(i => i.value.trim()).filter(Boolean);
+    const description = document.getElementById('descriptionInput').value.trim();
+
+    if(selectedTypes.size === 0){ showMsg('itemMsg', 'กรุณาเลือก Memory Type อย่างน้อย 1 อย่าง', 'error'); return; }
+    if(tags.length === 0){ showMsg('itemMsg', 'กรุณากรอก Tag อย่างน้อย 1 อัน', 'error'); return; }
+
+    const btn = document.getElementById('btnAddItem');
+    btn.disabled = true; btn.textContent = 'กำลังบันทึก...';
+
+    const body = {
+      action: 'createItem',
+      user_id: session.user_id,
+      username: session.username,
+      box_code: session.box_code,
+      memory_types: Array.from(selectedTypes),
+      image: itemImageUrl,
+      description,
+      tags,
+      is_public: document.getElementById('itemIsPublicInput').checked
+    };
+
+    try{
+      const res = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify(body) });
+      const data = await res.json();
+      if(data.success){
+        itemCount++;
+        addToList(itemImageUrl, Array.from(selectedTypes), tags);
+        resetItemForm();
+        showMsg('itemMsg', 'บันทึกความทรงจำนี้แล้ว ✓', 'success');
+      }else{
+        showMsg('itemMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
+      }
+    }catch(err){
+      showMsg('itemMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+    btn.disabled = false; btn.textContent = 'บันทึกความทรงจำนี้';
+  });
+
+  function addToList(image, types, tags){
+    const list = document.getElementById('addedList');
+    const counter = document.getElementById('itemCounter');
+    counter.style.display = 'inline-block';
+    counter.textContent = `เก็บไปแล้ว ${itemCount} ชิ้น`;
+
+    const row = document.createElement('div');
+    row.className = 'added-item';
+    row.innerHTML = `
+      <img src="${image || ''}" onerror="this.style.visibility='hidden'">
+      <div class="info"><b>${types.map(t=>MEMORY_TYPES.find(m=>m.key===t)?.emoji || '').join(' ')}</b><span>${tags.join(', ')}</span></div>
+    `;
+    list.prepend(row);
+  }
+
+  function resetItemForm(){
+    itemImageUrl = '';
+    document.getElementById('itemImagePreview').innerHTML = `<span class="plus">＋</span><span>เพิ่มรูปภาพ</span>`;
+    selectedTypes.clear();
+    document.querySelectorAll('#typeGrid .type-pill').forEach(p => p.classList.remove('selected'));
+    document.getElementById('descriptionInput').value = '';
+    document.querySelectorAll('.tag-input').forEach(i => i.value = '');
+    document.getElementById('itemIsPublicInput').checked = true;
+  }
+
+  document.getElementById('btnFinish').addEventListener('click', () => {
+    location.href = `profile.html?user_id=${session.user_id}`;
+  });
+
+  initProvinces();
+  initGenderPills();
+  initMemoryTypes();
+  showStep(1);
+</script>
+
+</body>
+</html>
