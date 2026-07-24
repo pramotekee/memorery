@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แก้ไขความทรงจำของฉัน — MeMorery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F1EE; --surface:#FFFDFB; --text:#1A1F2C; --text-soft:#5B5750;
+    --primary:#822E2A; --primary-dark:#631F1C; --accent:#AD9461;
+    --muted:#AB9E91; --forest:#536C62; --border:#E5DED4;
+    --danger:#B3261E; --radius:16px;
+    --shadow:0 8px 24px rgba(26,31,44,0.06); --shadow-hover:0 16px 40px rgba(26,31,44,0.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6; }
+  .wordmark{ font-family:'Lexend',sans-serif; font-weight:800; }
+  .wordmark .cap{ font-size:1.15em; color:var(--primary); }
+  a{ color:inherit; text-decoration:none; }
+  header{ padding:20px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .logo{ font-size:22px; }
+  .header-link{ font-size:13.5px; color:var(--text-soft); font-weight:600; }
+  .header-link:hover{ color:var(--primary); }
+
+  .wrap{ max-width:560px; margin:0 auto; padding:8px 20px 100px; }
+
+  h1.page-title{ font-family:'Lexend',sans-serif; font-size:26px; margin-bottom:8px; }
+  .page-sub{ color:var(--text-soft); font-size:14.5px; margin-bottom:28px; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); margin-bottom:20px; }
+  .card h3{ font-family:'Lexend',sans-serif; font-size:17px; margin-bottom:16px; }
+
+  label{ display:block; font-size:13.5px; font-weight:600; color:var(--text-soft); margin-bottom:7px; }
+  input[type="text"], input[type="date"], select, textarea{
+    width:100%; border:1px solid var(--border); background:var(--bg);
+    border-radius:10px; padding:12px 14px; font-family:'Inter',sans-serif;
+    font-size:15px; color:var(--text); margin-bottom:18px; outline:none;
+    transition:border-color .15s;
+  }
+  input:focus, select:focus, textarea:focus{ border-color:var(--primary); }
+  textarea{ resize:vertical; min-height:90px; }
+  .field-hint{ font-size:12px; color:var(--muted); margin-top:-13px; margin-bottom:16px; text-align:right; }
+
+  .code-input{
+    font-family:'Lexend',sans-serif; font-weight:700; font-size:24px;
+    letter-spacing:0.15em; text-align:center; text-transform:uppercase;
+  }
+  .locked-field{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--bg); border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; margin-bottom:18px; font-size:14.5px; color:var(--text-soft);
+  }
+  .locked-field b{ color:var(--text); font-family:'Lexend',sans-serif; letter-spacing:0.1em; }
+  .locked-field span.lock-icon{ font-size:13px; flex-shrink:0; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; padding:14px 24px; border-radius:999px;
+    font-size:15px; font-weight:700; cursor:pointer; border:none;
+    transition:all .2s;
+  }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-dark); }
+  .btn-primary:disabled{ background:var(--muted); cursor:not-allowed; }
+  .btn-outline{ background:transparent; border:1.5px solid var(--border); color:var(--text); margin-top:10px; }
+  .btn-outline:hover{ border-color:var(--primary); color:var(--primary); }
+  .btn-danger-outline{
+    background:transparent; border:1.5px solid rgba(179,38,30,0.35); color:var(--danger);
+  }
+  .btn-danger-outline:hover{ background:rgba(179,38,30,0.06); }
+
+  .msg{ font-size:13.5px; padding:12px 14px; border-radius:10px; margin-bottom:16px; display:none; }
+  .msg.error{ background:rgba(179,38,30,0.08); color:var(--danger); display:block; }
+  .msg.success{ background:rgba(83,108,98,0.1); color:var(--forest); display:block; }
+
+  /* ---------- Profile image upload ---------- */
+  .avatar-upload{ display:flex; flex-direction:column; align-items:center; margin-bottom:20px; }
+  .avatar-preview{
+    width:96px; height:96px; border-radius:50%; background:var(--bg);
+    border:2px dashed var(--border); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; margin-bottom:10px; cursor:pointer; position:relative;
+  }
+  .avatar-preview img{ width:100%; height:100%; object-fit:cover; }
+  .avatar-preview .plus{ font-size:26px; color:var(--muted); }
+  .avatar-upload span{ font-size:13px; color:var(--text-soft); cursor:pointer; }
+  .avatar-upload input[type="file"]{ display:none; }
+  .upload-spinner{
+    position:absolute; inset:0; background:rgba(255,255,255,0.85);
+    display:none; align-items:center; justify-content:center;
+  }
+  .upload-spinner.show{ display:flex; }
+  .spinner-ring{
+    width:26px; height:26px; border:3px solid rgba(130,46,42,0.15);
+    border-top-color:var(--primary); border-radius:50%;
+    animation:spin 0.7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .btn .spinner-ring{ width:17px; height:17px; border-width:2.5px; border-top-color:#fff; }
+
+  /* ---------- Gender pills / memory type pills ---------- */
+  .pill-group{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .pill-option{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:999px;
+    padding:9px 16px; font-size:13.5px; cursor:pointer; user-select:none; transition:all .15s;
+  }
+  .pill-option.selected{ background:var(--primary); border-color:var(--primary); color:#fff; }
+
+  .type-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .type-pill{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:999px;
+    padding:9px 14px; font-size:13.5px; cursor:pointer; user-select:none; transition:all .15s;
+  }
+  .type-pill.selected{ background:var(--forest); border-color:var(--forest); color:#fff; }
+
+  /* ---------- Item image upload (rectangular) ---------- */
+  .item-image-upload{
+    width:100%; aspect-ratio:1.4/1; border-radius:12px; background:var(--bg);
+    border:2px dashed var(--border); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; margin-bottom:18px; cursor:pointer; position:relative; flex-direction:column; gap:6px;
+  }
+  .item-image-upload img{ width:100%; height:100%; object-fit:cover; }
+  .item-image-upload .plus{ font-size:30px; color:var(--muted); }
+  .item-image-upload span{ font-size:13px; color:var(--text-soft); }
+  .item-image-upload input[type="file"]{ display:none; }
+
+  .tag-row{ display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:8px; margin-bottom:8px; }
+  .tag-row input{ margin-bottom:0; font-size:13.5px; padding:10px; }
+
+  /* ---------- Toggle switch ---------- */
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .toggle-row .toggle-label{ font-size:14px; color:var(--text); font-weight:500; }
+  .toggle-row .toggle-desc{ font-size:12.5px; color:var(--text-soft); margin-top:2px; }
+  .switch{ position:relative; width:46px; height:26px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer; transition:.2s; }
+  .slider::before{ content:''; position:absolute; width:20px; height:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .slider{ background:var(--forest); }
+  .switch input:checked + .slider::before{ transform:translateX(20px); }
+
+  /* ---------- Existing items list ---------- */
+  .section-heading{ display:flex; align-items:center; justify-content:space-between; margin:32px 0 14px; }
+  .section-heading h3{ font-family:'Lexend',sans-serif; font-size:18px; }
+  .section-heading span{ font-size:13px; color:var(--text-soft); }
+
+  .item-row{
+    display:flex; align-items:center; gap:14px; background:var(--surface);
+    border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:12px;
+  }
+  .item-row img{ width:56px; height:56px; border-radius:10px; object-fit:cover; background:var(--bg); flex-shrink:0; }
+  .item-row .info{ flex:1; min-width:0; }
+  .item-row .info b{ font-size:14px; display:block; margin-bottom:2px; }
+  .item-row .info span{ font-size:12.5px; color:var(--text-soft); display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .item-row .badge-private{ font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:2px 8px; margin-top:4px; display:inline-block; }
+  .item-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; border:1.5px solid var(--border);
+    background:var(--bg); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:15px; transition:all .15s;
+  }
+  .icon-btn:hover{ border-color:var(--primary); }
+  .icon-btn.danger:hover{ border-color:var(--danger); background:rgba(179,38,30,0.06); }
+
+  .empty-items{ text-align:center; color:var(--text-soft); font-size:13.5px; padding:24px; background:var(--surface); border:1px dashed var(--border); border-radius:14px; }
+
+  /* ---------- Modal (item edit) ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(26,31,44,0.5);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:100; padding:0; overflow-y:auto;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:var(--surface); border-radius:20px 20px 0 0;
+    padding:28px 24px 28px; width:100%; max-width:560px;
+    animation:slideUp .25s ease-out; margin-top:auto;
+  }
+  @keyframes slideUp{ from{ transform:translateY(30px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+  .modal-box h3{ font-family:'Lexend',sans-serif; font-size:19px; margin-bottom:18px; }
+
+  .confirm-box{ text-align:center; padding:32px 24px 28px; }
+  .confirm-icon{
+    width:56px; height:56px; border-radius:50%; background:rgba(179,38,30,0.1);
+    color:var(--danger); font-size:26px; display:flex; align-items:center; justify-content:center;
+    margin:0 auto 16px;
+  }
+  .confirm-box h3{ font-family:'Lexend',sans-serif; font-size:18px; margin-bottom:6px; }
+  .confirm-box p{ font-size:14px; color:var(--text-soft); margin-bottom:22px; }
+
+  .logout-link{ text-align:center; margin-top:24px; }
+  .logout-link a{ font-size:13px; color:var(--text-soft); text-decoration:underline; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo wordmark"><span class="cap">M</span>eMorery</a>
+  <a href="index.html" class="header-link">← กลับหน้าแรก</a>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== SCREEN 1: LOGIN ===================== -->
+  <div id="screenLogin">
+    <h1 class="page-title">เข้าสู่ระบบเพื่อแก้ไข</h1>
+    <p class="page-sub">กรอก username และ box code เดิมที่ใช้ตอนสร้างโปรไฟล์</p>
+    <div class="card">
+      <div class="msg" id="loginMsg"></div>
+      <label>Username</label>
+      <input type="text" id="loginUsername" placeholder="username ของคุณ">
+      <label>Box Code</label>
+      <input type="text" id="loginBoxCode" class="code-input" maxlength="8" placeholder="7K4M92FQ">
+      <button class="btn btn-primary" id="btnLogin">เข้าสู่ระบบ</button>
+    </div>
+  </div>
+
+  <!-- ===================== SCREEN 2: EDIT PROFILE + ITEMS ===================== -->
+  <div id="screenEdit" style="display:none;">
+    <h1 class="page-title">แก้ไขโปรไฟล์ของฉัน</h1>
+    <p class="page-sub">แก้ไขข้อมูลโปรไฟล์ หรือจัดการความทรงจำที่เคยเพิ่มไว้</p>
+
+    <div class="card">
+      <div class="msg" id="profileMsg"></div>
+
+      <div class="avatar-upload">
+        <div class="avatar-preview" id="avatarPreview">
+          <span class="plus" id="avatarPlus">＋</span>
+          <img id="avatarImg" style="display:none;">
+          <div class="upload-spinner" id="avatarSpinner"><div class="spinner-ring"></div></div>
+        </div>
+        <span onclick="document.getElementById('avatarFile').click()">เปลี่ยนรูปโปรไฟล์</span>
+        <input type="file" id="avatarFile" accept="image/*">
+      </div>
+
+      <label>Username *</label>
+      <input type="text" id="usernameInput" placeholder="ชื่อที่อยากให้คนอื่นเห็น">
+
+      <div class="locked-field">
+        <div>Box Code: <b id="boxCodeDisplay">••••••••</b></div>
+        <span class="lock-icon">🔒 แก้ไขไม่ได้</span>
+      </div>
+
+      <label>วันเกิด</label>
+      <input type="date" id="birthdayInput">
+      <div class="field-hint" id="ageDisplay"></div>
+
+      <label>เพศ</label>
+      <div class="pill-group" id="genderPills">
+        <div class="pill-option" data-value="male">ชาย</div>
+        <div class="pill-option" data-value="female">หญิง</div>
+        <div class="pill-option" data-value="not_specific">ไม่ระบุ</div>
+        <div class="pill-option" data-value="other">อื่นๆ</div>
+      </div>
+      <input type="text" id="genderOtherInput" placeholder="ระบุเพศของคุณ" style="display:none;">
+
+      <label>จังหวัด</label>
+      <select id="locationInput"><option value="">เลือกจังหวัด</option></select>
+
+      <label>About me</label>
+      <textarea id="aboutMeInput" maxlength="200" placeholder="เล่าเกี่ยวกับตัวคุณสั้นๆ..."></textarea>
+      <div class="field-hint"><span id="aboutMeCount">0</span>/200</div>
+
+      <label>ช่องทางติดต่อ (ใส่หรือไม่ใส่ก็ได้)</label>
+      <input type="text" id="lineInput" placeholder="ลิงก์ LINE">
+      <input type="text" id="facebookInput" placeholder="ลิงก์ Facebook">
+      <input type="text" id="tiktokInput" placeholder="username TikTok (ไม่ต้องใส่ @)">
+      <input type="text" id="instagramInput" placeholder="username Instagram (ไม่ต้องใส่ @)">
+      <input type="text" id="youtubeInput" placeholder="ลิงก์ YouTube">
+      <input type="text" id="xInput" placeholder="username X (ไม่ต้องใส่ @)">
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">เปิดโปรไฟล์สาธารณะ</div>
+          <div class="toggle-desc">คนอื่นค้นหาและดูโปรไฟล์คุณได้</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="isPublicInput">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="btn btn-primary" id="btnSaveProfile">บันทึกการแก้ไข</button>
+    </div>
+
+    <div class="section-heading">
+      <h3>ความทรงจำของฉัน</h3>
+      <span id="itemCountLabel"></span>
+    </div>
+    <div id="itemsList"></div>
+
+    <div class="logout-link">
+      <a id="btnLogout">ออกจากระบบ</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===================== MODAL: แก้ไข item ===================== -->
+<div class="modal-overlay" id="itemEditModal">
+  <div class="modal-box">
+    <h3>แก้ไขความทรงจำนี้</h3>
+    <div class="msg" id="itemEditMsg"></div>
+
+    <label>รูปของชิ้นนี้</label>
+    <div class="item-image-upload" id="editItemImagePreview">
+      <span class="plus" id="editItemImagePlus">＋</span>
+      <span id="editItemImageLabel">เพิ่มรูปภาพ</span>
+      <img id="editItemImg" style="display:none;">
+      <div class="upload-spinner" id="editItemImageSpinner"><div class="spinner-ring"></div></div>
+      <input type="file" id="editItemFile" accept="image/*">
+    </div>
+
+    <label>Memory Type (เลือกได้หลายอัน)</label>
+    <div class="type-grid" id="editTypeGrid"></div>
+
+    <label>เล่าความรู้สึก / เรื่องราวของชิ้นนี้</label>
+    <textarea id="editDescriptionInput" placeholder="เกิดอะไรขึ้นตอนนั้น รู้สึกยังไง..."></textarea>
+
+    <label>Tag (อย่างน้อย 1 อัน)</label>
+    <div class="tag-row">
+      <input type="text" class="edit-tag-input" placeholder="tag 1">
+      <input type="text" class="edit-tag-input" placeholder="tag 2">
+      <input type="text" class="edit-tag-input" placeholder="tag 3">
+      <input type="text" class="edit-tag-input" placeholder="tag 4">
+      <input type="text" class="edit-tag-input" placeholder="tag 5">
+    </div>
+    <div style="height:18px;"></div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">แสดงชิ้นนี้แบบสาธารณะ</div>
+        <div class="toggle-desc">คนอื่นเห็นชิ้นนี้ได้ถ้าโปรไฟล์เปิดสาธารณะด้วย</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="editItemIsPublicInput">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <button class="btn btn-primary" id="btnSaveItem">บันทึกการแก้ไข</button>
+    <button class="btn btn-outline" id="btnCancelItemEdit">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- ===================== MODAL: ยืนยันลบ item ===================== -->
+<div class="modal-overlay" id="deleteConfirmModal">
+  <div class="modal-box">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <h3>ลบความทรงจำนี้เลยไหม</h3>
+      <p>ลบแล้วกู้คืนไม่ได้ กรุณายืนยันอีกครั้ง</p>
+      <button class="btn btn-danger-outline" id="btnConfirmDelete">ลบเลย</button>
+      <button class="btn btn-outline" id="btnCancelDelete">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CONFIG = {
+    API_URL: 'https://script.google.com/macros/s/AKfycbxlD0LwyG7Y6HS_dSZqPpy805SUwAwrA5f9sdYF49d7WRUvXlBXTX7SS_C0926eruFgpQ/exec'
+  };
+
+  const PROVINCES = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
+
+  const MEMORY_TYPES = [
+    {key:'Love', emoji:'❤️', label:'Love'}, {key:'Family', emoji:'👨‍👩‍👧', label:'Family'},
+    {key:'Friends', emoji:'🤝', label:'Friends'}, {key:'Travel', emoji:'✈️', label:'Travel'},
+    {key:'Entertainment', emoji:'🎭', label:'Entertainment'}, {key:'Learning', emoji:'📚', label:'Learning'},
+    {key:'Career', emoji:'💼', label:'Career'}, {key:'Health', emoji:'🏃', label:'Health'},
+    {key:'Pets', emoji:'🐶', label:'Pets'}, {key:'Nature', emoji:'🌱', label:'Nature'},
+    {key:'Giving', emoji:'🙏', label:'Giving'}, {key:'Celebration', emoji:'🎉', label:'Celebration'},
+    {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Other', emoji:'💡', label:'Other'}
+  ];
+
+  // ===================== STATE (เก็บไว้ใน memory เท่านั้น ไม่แตะ localStorage — pattern เดียวกับ create.html) =====================
+  let session = { box_code:'', username:'', user_id:'' };
+  let selectedGender = '';
+  let profileImageUrl = '';
+  let myItems = [];
+  let editingItemId = null;   // item_id ที่กำลังแก้อยู่ในโมดัล
+  let editSelectedTypes = new Set();
+  let editItemImageUrl = '';
+  let deleteTargetId = null;
+
+  function showMsg(id, text, type){
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+  function clearMsg(id){
+    document.getElementById(id).className = 'msg';
+  }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  // ===================== INIT FIELDS =====================
+  function initProvinces(){
+    const sel = document.getElementById('locationInput');
+    PROVINCES.forEach(p => sel.insertAdjacentHTML('beforeend', `<option value="${p}">${p}</option>`));
+  }
+  function initGenderPills(){
+    document.querySelectorAll('#genderPills .pill-option').forEach(p => {
+      p.addEventListener('click', () => {
+        document.querySelectorAll('#genderPills .pill-option').forEach(x=>x.classList.remove('selected'));
+        p.classList.add('selected');
+        selectedGender = p.dataset.value;
+        document.getElementById('genderOtherInput').style.display = selectedGender === 'other' ? 'block' : 'none';
+      });
+    });
+  }
+  function selectGenderPill(value){
+    selectedGender = value || '';
+    document.querySelectorAll('#genderPills .pill-option').forEach(p => {
+      p.classList.toggle('selected', p.dataset.value === value);
+    });
+    document.getElementById('genderOtherInput').style.display = value === 'other' ? 'block' : 'none';
+  }
+  function initEditTypeGrid(){
+    const grid = document.getElementById('editTypeGrid');
+    MEMORY_TYPES.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'type-pill';
+      el.textContent = `${t.emoji} ${t.label}`;
+      el.dataset.key = t.key;
+      el.addEventListener('click', () => {
+        if(editSelectedTypes.has(t.key)){ editSelectedTypes.delete(t.key); el.classList.remove('selected'); }
+        else{ editSelectedTypes.add(t.key); el.classList.add('selected'); }
+      });
+      grid.appendChild(el);
+    });
+  }
+  document.getElementById('birthdayInput').addEventListener('change', function(){
+    if(!this.value){ document.getElementById('ageDisplay').textContent = ''; return; }
+    const birth = new Date(this.value);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if(m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    document.getElementById('ageDisplay').textContent = `อายุ ${age} ปี`;
+  });
+  document.getElementById('aboutMeInput').addEventListener('input', function(){
+    document.getElementById('aboutMeCount').textContent = this.value.length;
+  });
+  // มือถือมัก auto-capitalize ตัวแรก บังคับเป็นตัวเล็กเสมอ กัน login ไม่เข้าเพราะตัวพิมพ์ไม่ตรงกัน
+  document.getElementById('usernameInput').addEventListener('input', function(){
+    const pos = this.selectionStart;
+    this.value = this.value.toLowerCase();
+    this.setSelectionRange(pos, pos);
+  });
+  document.getElementById('loginUsername').addEventListener('input', function(){
+    const pos = this.selectionStart;
+    this.value = this.value.toLowerCase();
+    this.setSelectionRange(pos, pos);
+  });
+  document.getElementById('loginBoxCode').addEventListener('input', function(){
+    this.value = this.value.toUpperCase();
+  });
+
+  // ===================== IMAGE UPLOAD (resize -> base64 -> upload -> url) — เหมือน create.html =====================
+  function resizeImageFile(file, maxWidth){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxWidth / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadImageFile(file){
+    const base64 = await resizeImageFile(file, 1500);
+    const res = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'uploadImage',
+        image_base64: base64,
+        mime_type: 'image/jpeg',
+        file_name: 'memorery_' + Date.now() + '.jpg'
+      })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message || 'อัปโหลดรูปไม่สำเร็จ');
+    return data.url;
+  }
+
+  document.getElementById('avatarPreview').addEventListener('click', () => document.getElementById('avatarFile').click());
+  document.getElementById('avatarFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    if(!file) return;
+    const plus = document.getElementById('avatarPlus');
+    const img = document.getElementById('avatarImg');
+    const spinner = document.getElementById('avatarSpinner');
+    plus.style.display = 'none';
+    spinner.classList.add('show');
+    try{
+      const url = await uploadImageFile(file);
+      profileImageUrl = url;
+      img.src = url;
+      img.style.display = 'block';
+    }catch(err){
+      showMsg('profileMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      if(!profileImageUrl) plus.style.display = 'block';
+    }
+    spinner.classList.remove('show');
+  });
+
+  document.getElementById('editItemImagePreview').addEventListener('click', () => document.getElementById('editItemFile').click());
+  document.getElementById('editItemFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    if(!file) return;
+    const plus = document.getElementById('editItemImagePlus');
+    const label = document.getElementById('editItemImageLabel');
+    const img = document.getElementById('editItemImg');
+    const spinner = document.getElementById('editItemImageSpinner');
+    plus.style.display = 'none';
+    label.style.display = 'none';
+    spinner.classList.add('show');
+    try{
+      const url = await uploadImageFile(file);
+      editItemImageUrl = url;
+      img.src = url;
+      img.style.display = 'block';
+    }catch(err){
+      showMsg('itemEditMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      if(!editItemImageUrl){ plus.style.display = 'block'; label.style.display = 'block'; }
+    }
+    spinner.classList.remove('show');
+  });
+
+  // ===================== LOGIN =====================
+  document.getElementById('btnLogin').addEventListener('click', async () => {
+    clearMsg('loginMsg');
+    const username = document.getElementById('loginUsername').value.trim();
+    const box_code = document.getElementById('loginBoxCode').value.trim();
+    if(!username || !box_code){ showMsg('loginMsg', 'กรุณากรอก username และ box code', 'error'); return; }
+
+    const btn = document.getElementById('btnLogin');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
+
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'login', username, box_code })
+      });
+      const data = await res.json();
+      if(data.success){
+        session.username = username;
+        session.box_code = box_code;
+        session.user_id = data.user_id;
+        await loadMyProfile();
+        document.getElementById('screenLogin').style.display = 'none';
+        document.getElementById('screenEdit').style.display = 'block';
+      }else{
+        showMsg('loginMsg', data.message || 'เข้าสู่ระบบไม่สำเร็จ', 'error');
+        btn.disabled = false; btn.textContent = originalText;
+      }
+    }catch(err){
+      showMsg('loginMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      btn.disabled = false; btn.textContent = originalText;
+    }
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    session = { box_code:'', username:'', user_id:'' };
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginBoxCode').value = '';
+    document.getElementById('screenEdit').style.display = 'none';
+    document.getElementById('screenLogin').style.display = 'block';
+  });
+
+  // ===================== LOAD PROFILE + ITEMS =====================
+  async function loadMyProfile(){
+    const res = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'getMyProfile', user_id: session.user_id, username: session.username, box_code: session.box_code })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message || 'โหลดโปรไฟล์ไม่สำเร็จ');
+
+    const p = data.profile;
+    profileImageUrl = p.profile_image || '';
+    if(profileImageUrl){
+      document.getElementById('avatarImg').src = profileImageUrl;
+      document.getElementById('avatarImg').style.display = 'block';
+      document.getElementById('avatarPlus').style.display = 'none';
+    }
+    document.getElementById('usernameInput').value = p.username || '';
+    document.getElementById('boxCodeDisplay').textContent = session.box_code;
+    document.getElementById('birthdayInput').value = p.birthday || '';
+    document.getElementById('birthdayInput').dispatchEvent(new Event('change'));
+    selectGenderPill(p.gender || '');
+    document.getElementById('genderOtherInput').value = p.gender_other || '';
+    document.getElementById('locationInput').value = p.location || '';
+    document.getElementById('aboutMeInput').value = p.about_me || '';
+    document.getElementById('aboutMeCount').textContent = (p.about_me || '').length;
+    document.getElementById('lineInput').value = p.line || '';
+    document.getElementById('facebookInput').value = p.facebook || '';
+    document.getElementById('tiktokInput').value = p.tiktok || '';
+    document.getElementById('instagramInput').value = p.instagram || '';
+    document.getElementById('youtubeInput').value = p.youtube || '';
+    document.getElementById('xInput').value = p.x || '';
+    document.getElementById('isPublicInput').checked = p.is_public !== 'false';
+
+    myItems = data.items || [];
+    renderItemsList();
+  }
+
+  // ===================== SAVE PROFILE =====================
+  document.getElementById('btnSaveProfile').addEventListener('click', async () => {
+    clearMsg('profileMsg');
+    const newUsername = document.getElementById('usernameInput').value.trim();
+    if(!newUsername){ showMsg('profileMsg', 'กรุณากรอก username', 'error'); return; }
+    if(!selectedGender){ showMsg('profileMsg', 'กรุณาเลือกเพศ', 'error'); return; }
+
+    const btn = document.getElementById('btnSaveProfile');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
+
+    const body = {
+      action: 'updateProfile',
+      user_id: session.user_id,
+      username: session.username,   // ใช้ username เดิมยืนยันตัวตน
+      box_code: session.box_code,
+      new_username: newUsername,    // ชื่อใหม่ (ถ้าไม่เปลี่ยนก็ส่งค่าเดิมมาได้ ฝั่ง backend เช็คเอง)
+      profile_image: profileImageUrl,
+      birthday: document.getElementById('birthdayInput').value,
+      gender: selectedGender,
+      gender_other: document.getElementById('genderOtherInput').value.trim(),
+      location: document.getElementById('locationInput').value,
+      about_me: document.getElementById('aboutMeInput').value.trim(),
+      socials: {
+        line: document.getElementById('lineInput').value.trim(),
+        facebook: document.getElementById('facebookInput').value.trim(),
+        tiktok: document.getElementById('tiktokInput').value.trim().replace('@',''),
+        instagram: document.getElementById('instagramInput').value.trim().replace('@',''),
+        youtube: document.getElementById('youtubeInput').value.trim(),
+        x: document.getElementById('xInput').value.trim().replace('@','')
+      },
+      is_public: document.getElementById('isPublicInput').checked
+    };
+
+    try{
+      const res = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify(body) });
+      const data = await res.json();
+      if(data.success){
+        session.username = data.username || newUsername; // sync username ใหม่ไว้ยืนยันตัวตนครั้งต่อไปในหน้านี้
+        showMsg('profileMsg', 'บันทึกการแก้ไขเรียบร้อยแล้ว', 'success');
+      }else{
+        showMsg('profileMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
+      }
+    }catch(err){
+      showMsg('profileMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+    btn.disabled = false; btn.textContent = originalText;
+  });
+
+  // ===================== ITEMS LIST =====================
+  function renderItemsList(){
+    const wrap = document.getElementById('itemsList');
+    document.getElementById('itemCountLabel').textContent = myItems.length ? `${myItems.length} ชิ้น` : '';
+
+    if(!myItems.length){
+      wrap.innerHTML = `<div class="empty-items">ยังไม่มีความทรงจำที่เพิ่มไว้ <a href="create.html" style="color:var(--primary); text-decoration:underline;">เพิ่มชิ้นแรกเลย</a></div>`;
+      return;
+    }
+
+    wrap.innerHTML = myItems.map(i => {
+      const types = (i.memory_types || '').split(',').filter(Boolean);
+      const typeEmojis = types.map(k => MEMORY_TYPES.find(m=>m.key===k)?.emoji || '').join(' ');
+      const tags = (i.tags || '').split(',').filter(Boolean).join(', ');
+      const isPrivate = i.is_public === 'false';
+      return `
+        <div class="item-row">
+          <img src="${esc(i.image || '')}" onerror="this.style.visibility='hidden'">
+          <div class="info">
+            <b>${typeEmojis || '—'}</b>
+            <span>${esc(tags || i.description || 'ไม่มีคำอธิบาย')}</span>
+            ${isPrivate ? '<span class="badge-private">ส่วนตัว</span>' : ''}
+          </div>
+          <div class="item-actions">
+            <button class="icon-btn" onclick="openItemEdit('${i.item_id}')" aria-label="แก้ไข">✏️</button>
+            <button class="icon-btn danger" onclick="openDeleteConfirm('${i.item_id}')" aria-label="ลบ">🗑️</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ===================== EDIT ITEM MODAL =====================
+  function openItemEdit(item_id){
+    const item = myItems.find(i => i.item_id === item_id);
+    if(!item) return;
+    editingItemId = item_id;
+    clearMsg('itemEditMsg');
+
+    editSelectedTypes = new Set((item.memory_types || '').split(',').filter(Boolean));
+    document.querySelectorAll('#editTypeGrid .type-pill').forEach(p => {
+      p.classList.toggle('selected', editSelectedTypes.has(p.dataset.key));
+    });
+
+    editItemImageUrl = item.image || '';
+    const img = document.getElementById('editItemImg');
+    const plus = document.getElementById('editItemImagePlus');
+    const label = document.getElementById('editItemImageLabel');
+    if(editItemImageUrl){
+      img.src = editItemImageUrl; img.style.display = 'block';
+      plus.style.display = 'none'; label.style.display = 'none';
+    }else{
+      img.style.display = 'none'; img.src = '';
+      plus.style.display = 'block'; label.style.display = 'block';
+    }
+
+    document.getElementById('editDescriptionInput').value = item.description || '';
+    const tagInputs = document.querySelectorAll('.edit-tag-input');
+    const tags = (item.tags || '').split(',').filter(Boolean);
+    tagInputs.forEach((el, idx) => { el.value = tags[idx] || ''; });
+    document.getElementById('editItemIsPublicInput').checked = item.is_public !== 'false';
+
+    document.getElementById('itemEditModal').classList.add('show');
+  }
+
+  document.getElementById('btnCancelItemEdit').addEventListener('click', () => {
+    document.getElementById('itemEditModal').classList.remove('show');
+    editingItemId = null;
+  });
+
+  document.getElementById('btnSaveItem').addEventListener('click', async () => {
+    clearMsg('itemEditMsg');
+    const tags = Array.from(document.querySelectorAll('.edit-tag-input')).map(i => i.value.trim()).filter(Boolean);
+    const description = document.getElementById('editDescriptionInput').value.trim();
+
+    if(editSelectedTypes.size === 0){ showMsg('itemEditMsg', 'กรุณาเลือก Memory Type อย่างน้อย 1 อย่าง', 'error'); return; }
+    if(tags.length === 0){ showMsg('itemEditMsg', 'กรุณากรอก Tag อย่างน้อย 1 อัน', 'error'); return; }
+
+    const btn = document.getElementById('btnSaveItem');
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
+
+    const body = {
+      action: 'updateItem',
+      item_id: editingItemId,
+      user_id: session.user_id,
+      username: session.username,
+      box_code: session.box_code,
+      memory_types: Array.from(editSelectedTypes),
+      image: editItemImageUrl,
+      description,
+      tags,
+      is_public: document.getElementById('editItemIsPublicInput').checked
+    };
+
+    try{
+      const res = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify(body) });
+      const data = await res.json();
+      if(data.success){
+        document.getElementById('itemEditModal').classList.remove('show');
+        editingItemId = null;
+        await loadMyProfile();
+      }else{
+        showMsg('itemEditMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
+      }
+    }catch(err){
+      showMsg('itemEditMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+    btn.disabled = false; btn.textContent = 'บันทึกการแก้ไข';
+  });
+
+  // ===================== DELETE ITEM =====================
+  function openDeleteConfirm(item_id){
+    deleteTargetId = item_id;
+    document.getElementById('deleteConfirmModal').classList.add('show');
+  }
+  document.getElementById('btnCancelDelete').addEventListener('click', () => {
+    deleteTargetId = null;
+    document.getElementById('deleteConfirmModal').classList.remove('show');
+  });
+  document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+    if(!deleteTargetId) return;
+    const btn = document.getElementById('btnConfirmDelete');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring" style="border-top-color:var(--danger);"></div>';
+
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'deleteItem', item_id: deleteTargetId,
+          user_id: session.user_id, username: session.username, box_code: session.box_code
+        })
+      });
+      const data = await res.json();
+      if(data.success){
+        document.getElementById('deleteConfirmModal').classList.remove('show');
+        deleteTargetId = null;
+        await loadMyProfile();
+      }else{
+        alert(data.message || 'ลบไม่สำเร็จ ลองใหม่อีกครั้ง');
+      }
+    }catch(err){
+      alert('เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง');
+    }
+    btn.disabled = false; btn.textContent = originalText;
+  });
+
+  initProvinces();
+  initGenderPills();
+  initEditTypeGrid();
+</script>
+
+</body>
+</html>
