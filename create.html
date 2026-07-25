@@ -577,6 +577,13 @@
       if(data.success){
         session.username = username;
         session.user_id = data.user_id;
+        // เก็บ session ไว้ในแท็บนี้ (sessionStorage หายเองตอนปิดแท็บ) เพื่อให้ profile.html
+        // จำเจ้าของได้ทันทีโดยไม่ต้อง login ซ้ำหลังเพิ่งสร้างโปรไฟล์เสร็จ
+        try{
+          sessionStorage.setItem('mm_owner_session', JSON.stringify({
+            user_id: session.user_id, username: session.username, box_code: session.box_code
+          }));
+        }catch(err){ /* เงียบไว้ ไม่กระทบ flow หลัก */ }
         showStep(3);
       }else{
         showMsg('profileMsg', data.message || 'สร้างโปรไฟล์ไม่สำเร็จ', 'error');
