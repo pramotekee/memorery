@@ -117,8 +117,12 @@
     display:inline-flex; align-items:center; gap:6px;
     background:var(--surface); border:1px solid var(--border);
     border-radius:999px; padding:8px 14px; font-size:13px; font-weight:500;
+    cursor:pointer; user-select:none; transition:all .15s;
   }
+  .category-pill:hover{ border-color:var(--primary); }
   .category-pill b{ color:var(--primary); font-weight:700; }
+  .category-pill.selected{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .category-pill.selected b{ color:#fff; }
 
   /* ---------- SEARCH & FILTER ---------- */
   .search-section{ max-width:1240px; margin:0 auto; padding:36px 24px 0; }
@@ -374,9 +378,19 @@
 
   function renderCategoryPills(counts){
     const wrap = document.getElementById('categoryPills');
+    const selected = document.getElementById('filterMemoryType').value;
     wrap.innerHTML = MEMORY_TYPES.map(t => `
-      <span class="category-pill">${t.emoji} ${t.label} <b>${counts[t.key] || 0}</b></span>
+      <span class="category-pill${t.key === selected ? ' selected' : ''}" data-key="${t.key}">${t.emoji} ${t.label} <b>${counts[t.key] || 0}</b></span>
     `).join('');
+    wrap.querySelectorAll('.category-pill').forEach(el => {
+      el.addEventListener('click', () => {
+        const key = el.dataset.key;
+        const sel = document.getElementById('filterMemoryType');
+        sel.value = (sel.value === key) ? '' : key; // กด pill เดิมซ้ำ = ยกเลิกฟิลเตอร์ กลับไปโชว์ทุกหมวด
+        document.getElementById('cards').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        fetchCards();
+      });
+    });
   }
 
   function renderCards(){
