@@ -90,14 +90,11 @@
   #bannerTrack{ display:flex; width:100%; height:100%; touch-action:pan-y; cursor:grab; }
   #bannerTrack img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
 
-  /* จอคอม/แท็บเล็ตแนวนอน: เลิกเบ่งเต็มจอ ให้อยู่ในกรอบ max-width เดียวกับ content
-     + สัดส่วนแบนลง + มี max-height กันสูงบ้าคลั่งตอนจอกว้าง */
+  /* จอคอม/แท็บเล็ตแนวนอน: ยังชนขอบจอซ้าย-ขวาเหมือนเดิม (full-bleed) แค่แบนลง + คุม max-height
+     กันไม่ให้สูงบ้าคลั่งตามความกว้างจอ — ไม่ดึงเข้ามาเป็นกรอบ ไม่มี margin ซ้าย-ขวา */
   @media(min-width:768px){
     #heroBanner{
-      width:100%; max-width:1240px;
-      margin-left:auto; margin-right:auto;
       aspect-ratio:3.6/1; max-height:260px;
-      border-radius:var(--radius);
     }
   }
 
