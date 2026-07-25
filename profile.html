@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โปรไฟล์ — MeMorery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F1EE; --surface:#FFFDFB; --text:#1A1F2C; --text-soft:#5B5750;
+    --primary:#822E2A; --primary-dark:#631F1C; --accent:#AD9461;
+    --muted:#AB9E91; --forest:#536C62; --border:#E5DED4;
+    --danger:#B3261E; --radius:16px; --line-green:#06C755;
+    --shadow:0 8px 24px rgba(26,31,44,0.06); --shadow-hover:0 16px 40px rgba(26,31,44,0.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .wordmark{ font-family:'Lexend',sans-serif; font-weight:800; }
+  .wordmark .cap{ font-size:1.15em; color:var(--primary); }
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
+  button{ font-family:'Inter',sans-serif; }
+
+  header{ padding:20px 24px; display:flex; align-items:center; justify-content:space-between; max-width:900px; margin:0 auto; gap:12px; }
+  .header-left{ display:flex; align-items:center; gap:18px; }
+  .logo{ font-size:22px; }
+  .header-link{ font-size:13.5px; color:var(--text-soft); font-weight:600; }
+  .header-link:hover{ color:var(--primary); }
+  .header-login-btn{
+    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
+    color:var(--accent); border:1.5px solid var(--accent); background:transparent;
+    border-radius:999px; padding:8px 16px; cursor:pointer; transition:all .15s; white-space:nowrap;
+  }
+  .header-login-btn:hover{ background:var(--accent); color:#fff; }
+
+  .wrap{ max-width:900px; margin:0 auto; padding:8px 20px 100px; }
+
+  /* ---------- generic states ---------- */
+  .state-box{ text-align:center; padding:80px 20px; color:var(--text-soft); }
+  .state-box .state-icon{ font-size:40px; margin-bottom:14px; }
+  .state-box h2{ font-family:'Lexend',sans-serif; font-size:19px; color:var(--text); margin-bottom:8px; }
+  .state-box p{ font-size:14px; margin-bottom:20px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:12px 24px; border-radius:999px; font-size:14.5px; font-weight:700;
+    cursor:pointer; border:none; transition:all .2s;
+  }
+  .btn-primary{ background:var(--primary); color:#fff; }
+  .btn-primary:hover{ background:var(--primary-dark); }
+  .btn-primary:disabled{ background:var(--muted); cursor:not-allowed; }
+  .btn-outline{ background:transparent; border:1.5px solid var(--border); color:var(--text); }
+  .btn-outline:hover{ border-color:var(--primary); color:var(--primary); }
+  .btn-sm{ padding:8px 16px; font-size:13px; }
+  .spinner-ring{ width:26px; height:26px; border:3px solid rgba(130,46,42,0.15); border-top-color:var(--primary); border-radius:50%; animation:spin .7s linear infinite; }
+  .btn .spinner-ring{ width:15px; height:15px; border-width:2.5px; border-top-color:#fff; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- profile header ---------- */
+  .profile-head{ text-align:center; padding:20px 0 8px; }
+  .avatar-wrap{ position:relative; width:104px; height:104px; margin:0 auto 16px; }
+  .avatar-big{
+    width:104px; height:104px; border-radius:50%; object-fit:cover;
+    background:var(--surface); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--border);
+    cursor:zoom-in;
+  }
+  .avatar-placeholder{
+    width:104px; height:104px; border-radius:50%; background:var(--surface);
+    border:3px solid var(--surface); box-shadow:0 0 0 1px var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:36px; color:var(--muted);
+  }
+  .edit-fab{
+    position:absolute; right:-2px; bottom:0; width:32px; height:32px; border-radius:50%;
+    background:var(--primary); color:#fff; border:2px solid var(--bg);
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+    cursor:pointer; box-shadow:var(--shadow);
+  }
+  .edit-fab:hover{ background:var(--primary-dark); }
+  .avatar-file-input{ display:none; }
+
+  .profile-username{ font-family:'Lexend',sans-serif; font-weight:700; font-size:23px; margin-bottom:6px; }
+  .profile-username .priv-tag{
+    display:inline-block; font-size:11px; font-weight:600; color:var(--muted);
+    background:var(--surface); border:1px solid var(--border); border-radius:999px;
+    padding:2px 10px; margin-left:8px; vertical-align:middle;
+  }
+  .profile-about{ font-size:14.5px; color:var(--text-soft); max-width:480px; margin:0 auto 16px; white-space:pre-line; }
+
+  .social-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+  .social-icon{
+    width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    transition:all .15s; cursor:pointer; box-shadow:var(--shadow); flex-shrink:0;
+  }
+  .social-icon svg{ width:19px; height:19px; }
+  .social-icon:hover{ transform:translateY(-2px); box-shadow:var(--shadow-hover); }
+
+  .owner-toolbar{
+    display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+    margin-bottom:28px; padding:12px 16px; background:var(--surface); border:1px solid var(--border);
+    border-radius:999px; max-width:fit-content; margin-left:auto; margin-right:auto;
+  }
+  .owner-toolbar .divider{ width:1px; height:18px; background:var(--border); }
+  .visibility-toggle{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-soft); }
+  .switch{ position:relative; width:40px; height:23px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer; transition:.2s; }
+  .slider::before{ content:''; position:absolute; width:17px; height:17px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  .switch input:checked + .slider{ background:var(--forest); }
+  .switch input:checked + .slider::before{ transform:translateX(17px); }
+  .switch.mini{ width:34px; height:20px; }
+  .switch.mini .slider::before{ width:14px; height:14px; }
+  .switch.mini input:checked + .slider::before{ transform:translateX(14px); }
+  .toolbar-link{ font-size:13px; font-weight:600; color:var(--text-soft); cursor:pointer; }
+  .toolbar-link:hover{ color:var(--primary); }
+  .share-btn{
+    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600;
+    color:var(--text-soft); cursor:pointer; background:transparent; border:none;
+  }
+  .share-btn:hover{ color:var(--primary); }
+
+  .just-share{ display:flex; justify-content:center; margin-bottom:28px; }
+
+  /* ---------- mini dashboard ---------- */
+  .dashboard{ margin-bottom:24px; }
+  .dashboard h3{ font-size:13px; font-weight:700; color:var(--text-soft); text-align:center; margin-bottom:12px; }
+  .category-pills{ display:flex; gap:9px; flex-wrap:wrap; justify-content:center; }
+  .category-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:999px; padding:8px 14px; font-size:13px; font-weight:500;
+    cursor:pointer; user-select:none; transition:all .15s;
+  }
+  .category-pill:hover{ border-color:var(--primary); }
+  .category-pill b{ color:var(--primary); font-weight:700; }
+  .category-pill.selected{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .category-pill.selected b{ color:#fff; }
+
+  /* ---------- items ---------- */
+  .items-heading{ display:flex; align-items:center; justify-content:space-between; margin:8px 0 16px; }
+  .items-heading h3{ font-family:'Lexend',sans-serif; font-size:18px; }
+  .items-heading span{ font-size:13px; color:var(--text-soft); }
+
+  .items-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px; }
+
+  .add-item-card{
+    border:2px dashed var(--border); border-radius:var(--radius); background:var(--surface);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+    padding:30px 20px; cursor:pointer; color:var(--text-soft); min-height:220px; transition:all .15s;
+  }
+  .add-item-card:hover{ border-color:var(--primary); color:var(--primary); }
+  .add-item-card .plus-circle{
+    width:44px; height:44px; border-radius:50%; background:var(--bg); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+  }
+
+  .item-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    overflow:hidden; box-shadow:var(--shadow); transition:box-shadow .2s, transform .2s;
+    scroll-margin-top:24px;
+  }
+  .item-card.highlight{ box-shadow:0 0 0 3px var(--accent), var(--shadow-hover); }
+  .item-media{
+    width:100%; aspect-ratio:1.3/1; background:var(--bg); overflow:hidden; cursor:zoom-in; position:relative;
+  }
+  .item-media img{ width:100%; height:100%; object-fit:cover; }
+  .item-media.no-image{ display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:30px; cursor:default; }
+  .item-body{ padding:16px 16px 14px; }
+  .item-types{ display:flex; flex-wrap:wrap; gap:5px; margin-bottom:9px; }
+  .type-chip{
+    font-size:11.5px; font-weight:600; background:var(--bg); border:1px solid var(--border);
+    border-radius:999px; padding:3px 10px; color:var(--text-soft);
+  }
+  .item-desc{
+    font-size:13.8px; color:var(--text); margin-bottom:4px;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  }
+  .item-desc.expanded{ -webkit-line-clamp:unset; overflow:visible; }
+  .item-desc.empty{ color:var(--muted); font-style:italic; }
+  .desc-toggle{
+    background:none; border:none; color:var(--primary); font-size:12.5px; font-weight:700;
+    cursor:pointer; padding:2px 0 8px; display:none;
+  }
+  .desc-toggle.show{ display:inline-flex; align-items:center; gap:3px; }
+  .item-tags{ font-size:12px; color:var(--accent); margin-bottom:6px; }
+  .item-footer{ display:flex; align-items:center; justify-content:space-between; margin-top:8px; }
+  .item-date{ font-size:11px; color:var(--muted); }
+  .private-badge{ font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
+
+  .item-owner-row{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
+  }
+  .icon-btn{
+    width:32px; height:32px; border-radius:50%; border:1.5px solid var(--border);
+    background:var(--bg); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:13px; transition:all .15s; flex-shrink:0;
+  }
+  .icon-btn:hover{ border-color:var(--primary); }
+
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--text-soft); grid-column:1/-1; }
+
+  /* ---------- lightbox ---------- */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(15,12,10,0.92); display:none;
+    align-items:center; justify-content:center; z-index:200; cursor:zoom-out; padding:24px;
+  }
+  .lightbox.show{ display:flex; }
+  .lightbox img{ max-width:100%; max-height:100%; border-radius:8px; object-fit:contain; }
+
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(26,31,44,0.5);
+    display:none; align-items:flex-end; justify-content:center;
+    z-index:150; padding:0; overflow-y:auto;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal-box{
+    background:var(--surface); border-radius:20px 20px 0 0;
+    padding:28px 24px 28px; width:100%; max-width:560px;
+    animation:slideUp .25s ease-out; margin-top:auto;
+  }
+  @keyframes slideUp{ from{ transform:translateY(30px); opacity:0; } to{ transform:translateY(0); opacity:1; } }
+  .modal-box h3{ font-family:'Lexend',sans-serif; font-size:19px; margin-bottom:18px; }
+
+  label{ display:block; font-size:13.5px; font-weight:600; color:var(--text-soft); margin-bottom:7px; }
+  input[type="text"], textarea{
+    width:100%; border:1px solid var(--border); background:var(--bg);
+    border-radius:10px; padding:12px 14px; font-family:'Inter',sans-serif;
+    font-size:15px; color:var(--text); margin-bottom:18px; outline:none; transition:border-color .15s;
+  }
+  input:focus, textarea:focus{ border-color:var(--primary); }
+  textarea{ resize:vertical; min-height:80px; }
+  .code-input{ font-family:'Lexend',sans-serif; font-weight:700; font-size:22px; letter-spacing:0.15em; text-align:center; text-transform:uppercase; }
+
+  .msg{ font-size:13.5px; padding:12px 14px; border-radius:10px; margin-bottom:16px; display:none; }
+  .msg.error{ background:rgba(179,38,30,0.08); color:var(--danger); display:block; }
+  .msg.success{ background:rgba(83,108,98,0.1); color:var(--forest); display:block; }
+
+  .item-image-upload{
+    width:100%; aspect-ratio:1.4/1; border-radius:12px; background:var(--bg);
+    border:2px dashed var(--border); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; margin-bottom:18px; cursor:pointer; position:relative; flex-direction:column; gap:6px;
+  }
+  .item-image-upload img{ width:100%; height:100%; object-fit:cover; }
+  .item-image-upload .plus{ font-size:30px; color:var(--muted); }
+  .item-image-upload span{ font-size:13px; color:var(--text-soft); }
+  .item-image-upload input[type="file"]{ display:none; }
+  .upload-spinner{ position:absolute; inset:0; background:rgba(255,255,255,0.85); display:none; align-items:center; justify-content:center; }
+  .upload-spinner.show{ display:flex; }
+
+  .type-grid{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+  .type-pill{
+    border:1.5px solid var(--border); background:var(--bg); border-radius:999px;
+    padding:9px 14px; font-size:13.5px; cursor:pointer; user-select:none; transition:all .15s;
+  }
+  .type-pill.selected{ background:var(--forest); border-color:var(--forest); color:#fff; }
+
+  .tag-row{ display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:8px; margin-bottom:8px; }
+  .tag-row input{ margin-bottom:0; font-size:13.5px; padding:10px; }
+
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; margin:18px 0; }
+  .toggle-row .toggle-label{ font-size:14px; color:var(--text); font-weight:500; }
+  .toggle-row .toggle-desc{ font-size:12.5px; color:var(--text-soft); margin-top:2px; }
+
+  .modal-actions{ display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  .modal-actions .btn{ width:100%; }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--text); color:#fff; font-size:13.5px; font-weight:600;
+    padding:12px 22px; border-radius:999px; box-shadow:var(--shadow-hover);
+    opacity:0; pointer-events:none; transition:all .25s; z-index:300;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media(max-width:480px){
+    .owner-toolbar{ max-width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="index.html" class="logo wordmark"><span class="cap">M</span>eMorery</a>
+    <a href="index.html" class="header-link">← กลับหน้าแรก</a>
+  </div>
+  <button class="header-login-btn" id="btnHeaderLogin" style="display:none;">🔑 เข้าสู่ระบบเจ้าของโปรไฟล์</button>
+</header>
+
+<div class="wrap">
+
+  <div id="stateLoading" class="state-box">
+    <div class="spinner-ring" style="margin:0 auto;"></div>
+    <p style="margin-top:16px;">กำลังโหลดโปรไฟล์...</p>
+  </div>
+
+  <div id="statePrivate" class="state-box" style="display:none;">
+    <div class="state-icon">🔒</div>
+    <h2>โปรไฟล์นี้เป็นส่วนตัว</h2>
+    <p>เจ้าของตั้งค่าไม่ให้คนอื่นมองเห็น</p>
+    <button class="btn btn-outline" id="btnOwnerLoginFromPrivate">เข้าสู่ระบบในฐานะเจ้าของโปรไฟล์</button>
+  </div>
+
+  <div id="stateNotFound" class="state-box" style="display:none;">
+    <div class="state-icon">🕳️</div>
+    <h2>ไม่พบโปรไฟล์นี้</h2>
+    <p>ลิงก์อาจไม่ถูกต้อง หรือผู้ใช้ถูกลบไปแล้ว</p>
+    <a href="index.html" class="btn btn-primary">กลับหน้าแรก</a>
+  </div>
+
+  <div id="stateProfile" style="display:none;">
+
+    <div class="profile-head">
+      <div class="avatar-wrap">
+        <img class="avatar-big" id="avatarImg" style="display:none;" onclick="openLightbox(this.src)">
+        <div class="avatar-placeholder" id="avatarPlaceholder">👤</div>
+        <div class="edit-fab" id="btnEditAvatar" title="แก้ไขรูปโปรไฟล์" style="display:none;">✏️</div>
+        <input type="file" class="avatar-file-input" id="avatarFileInput" accept="image/*">
+      </div>
+
+      <div class="profile-username" id="profileUsername">—<span class="priv-tag" id="privTag" style="display:none;">ส่วนตัว</span></div>
+      <div class="profile-about" id="profileAbout" style="display:none;"></div>
+
+      <div class="social-row" id="socialRow"></div>
+
+      <div class="owner-toolbar" id="ownerToolbar" style="display:none;">
+        <div class="visibility-toggle">
+          <span>เปิดสาธารณะ</span>
+          <label class="switch mini">
+            <input type="checkbox" id="accountPublicToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="divider"></div>
+        <span class="toolbar-link" id="btnGoFullEdit">แก้ไขข้อมูลโปรไฟล์</span>
+        <div class="divider"></div>
+        <span class="toolbar-link" id="btnLogoutOwner">ออกจากระบบ</span>
+      </div>
+
+      <div class="just-share">
+        <button class="share-btn" id="btnShareProfile">🔗 แชร์โปรไฟล์นี้</button>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <h3>หมวดความทรงจำ</h3>
+      <div class="category-pills" id="categoryPills"></div>
+    </div>
+
+    <div class="items-heading">
+      <h3>ความทรงจำทั้งหมด</h3>
+      <span id="itemCountLabel"></span>
+    </div>
+    <div class="items-grid" id="itemsGrid"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg">
+</div>
+
+<!-- ===================== LOGIN MODAL ===================== -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-box">
+    <h3>เข้าสู่ระบบเจ้าของโปรไฟล์</h3>
+    <div class="msg" id="loginMsg"></div>
+    <label>Username</label>
+    <input type="text" id="loginUsername" placeholder="username ของคุณ">
+    <label>Box Code</label>
+    <input type="text" id="loginBoxCode" class="code-input" maxlength="8" placeholder="7K4M92FQ">
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="btnLoginSubmit">เข้าสู่ระบบ</button>
+      <button class="btn btn-outline" id="btnLoginCancel">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ADD ITEM MODAL ===================== -->
+<div class="modal-overlay" id="addItemModal">
+  <div class="modal-box">
+    <h3>เพิ่มความทรงจำใหม่</h3>
+    <div class="msg" id="addItemMsg"></div>
+
+    <label>รูปของชิ้นนี้</label>
+    <div class="item-image-upload" id="addItemImagePreview">
+      <span class="plus" id="addItemImagePlus">＋</span>
+      <span id="addItemImageLabel">เพิ่มรูปภาพ</span>
+      <img id="addItemImg" style="display:none;">
+      <div class="upload-spinner" id="addItemImageSpinner"><div class="spinner-ring"></div></div>
+      <input type="file" id="addItemFile" accept="image/*">
+    </div>
+
+    <label>Memory Type (เลือกได้หลายอัน)</label>
+    <div class="type-grid" id="addTypeGrid"></div>
+
+    <label>เล่าความรู้สึก / เรื่องราวของชิ้นนี้</label>
+    <textarea id="addDescriptionInput" placeholder="เกิดอะไรขึ้นตอนนั้น รู้สึกยังไง..."></textarea>
+
+    <label>Tag (อย่างน้อย 1 อัน)</label>
+    <div class="tag-row">
+      <input type="text" class="add-tag-input" placeholder="tag 1">
+      <input type="text" class="add-tag-input" placeholder="tag 2">
+      <input type="text" class="add-tag-input" placeholder="tag 3">
+      <input type="text" class="add-tag-input" placeholder="tag 4">
+      <input type="text" class="add-tag-input" placeholder="tag 5">
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">แสดงชิ้นนี้แบบสาธารณะ</div>
+        <div class="toggle-desc">คนอื่นเห็นชิ้นนี้ได้ถ้าโปรไฟล์เปิดสาธารณะด้วย</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="addItemIsPublicInput" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="btnSaveAddItem">บันทึกความทรงจำนี้</button>
+      <button class="btn btn-outline" id="btnCancelAddItem">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== EDIT ITEM MODAL ===================== -->
+<div class="modal-overlay" id="editItemModal">
+  <div class="modal-box">
+    <h3>แก้ไขความทรงจำนี้</h3>
+    <div class="msg" id="editItemMsg"></div>
+
+    <label>รูปของชิ้นนี้</label>
+    <div class="item-image-upload" id="editItemImagePreview">
+      <span class="plus" id="editItemImagePlus">＋</span>
+      <span id="editItemImageLabel">เพิ่มรูปภาพ</span>
+      <img id="editItemImg" style="display:none;">
+      <div class="upload-spinner" id="editItemImageSpinner"><div class="spinner-ring"></div></div>
+      <input type="file" id="editItemFile" accept="image/*">
+    </div>
+
+    <label>Memory Type (เลือกได้หลายอัน)</label>
+    <div class="type-grid" id="editTypeGrid"></div>
+
+    <label>เล่าความรู้สึก / เรื่องราวของชิ้นนี้</label>
+    <textarea id="editDescriptionInput" placeholder="เกิดอะไรขึ้นตอนนั้น รู้สึกยังไง..."></textarea>
+
+    <label>Tag (อย่างน้อย 1 อัน)</label>
+    <div class="tag-row">
+      <input type="text" class="edit-tag-input" placeholder="tag 1">
+      <input type="text" class="edit-tag-input" placeholder="tag 2">
+      <input type="text" class="edit-tag-input" placeholder="tag 3">
+      <input type="text" class="edit-tag-input" placeholder="tag 4">
+      <input type="text" class="edit-tag-input" placeholder="tag 5">
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="toggle-label">แสดงชิ้นนี้แบบสาธารณะ</div>
+        <div class="toggle-desc">คนอื่นเห็นชิ้นนี้ได้ถ้าโปรไฟล์เปิดสาธารณะด้วย</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="editItemIsPublicInput">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="btnSaveEditItem">บันทึกการแก้ไข</button>
+      <button class="btn btn-outline" id="btnCancelEditItem">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const CONFIG = {
+    API_URL: 'https://script.google.com/macros/s/AKfycbxlD0LwyG7Y6HS_dSZqPpy805SUwAwrA5f9sdYF49d7WRUvXlBXTX7SS_C0926eruFgpQ/exec'
+  };
+
+  const MEMORY_TYPES = [
+    {key:'Love', emoji:'❤️', label:'Love'}, {key:'Family', emoji:'👨‍👩‍👧', label:'Family'},
+    {key:'Friends', emoji:'🤝', label:'Friends'}, {key:'Travel', emoji:'✈️', label:'Travel'},
+    {key:'Entertainment', emoji:'🎭', label:'Entertainment'}, {key:'Learning', emoji:'📚', label:'Learning'},
+    {key:'Career', emoji:'💼', label:'Career'}, {key:'Health', emoji:'🏃', label:'Health'},
+    {key:'Pets', emoji:'🐶', label:'Pets'}, {key:'Nature', emoji:'🌱', label:'Nature'},
+    {key:'Giving', emoji:'🙏', label:'Giving'}, {key:'Celebration', emoji:'🎉', label:'Celebration'},
+    {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Other', emoji:'💡', label:'Other'}
+  ];
+  const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+  // ไอคอนแบรนด์จริงของแต่ละแพลตฟอร์ม (สี + SVG) ให้ผู้ใช้เห็นแล้วรู้ทันทีว่าเป็นแพลตฟอร์มไหน
+  const SOCIAL_ICONS = {
+    line: {
+      bg: '#06C755',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3C6.98 3 3 6.42 3 10.6c0 3.75 3.16 6.9 7.43 7.5.29.06.68.19.78.44.09.23.06.58.03.81l-.13.77c-.04.23-.18.9.79.49s5.24-3.09 7.15-5.29C20.36 13.7 21 12.24 21 10.6 21 6.42 17.02 3 12 3z" fill="#fff"/><path d="M9.6 8.9h-.9a.25.25 0 00-.25.25v3.9c0 .14.11.25.25.25h.9c.14 0 .25-.11.25-.25v-3.9a.25.25 0 00-.25-.25z" fill="#06C755"/><path d="M14.1 8.9h-.9a.25.25 0 00-.25.25v2.32l-1.79-2.42a.26.26 0 00-.02-.03l-.02-.02h-.01l-.02-.01h-.05l-.02-.01h-.9a.25.25 0 00-.25.25v3.9c0 .14.11.25.25.25h.9c.14 0 .25-.11.25-.25v-2.32l1.8 2.43c.02.02.04.04.06.06l.02.01h.01l.02.01h.02l.02.01h.9c.14 0 .25-.11.25-.25v-3.9a.25.25 0 00-.25-.25z" fill="#06C755"/></svg>'
+    },
+    facebook: {
+      bg: '#1877F2',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><path d="M15.5 8.5h1.8V5.7c-.31-.04-1.38-.13-2.62-.13-2.6 0-4.38 1.63-4.38 4.63v2.5H7.5v3.13h2.8V21h3.13v-5.17h2.68l.43-3.13h-3.11v-2.15c0-.9.25-1.52 1.57-1.52z" fill="#fff"/></svg>'
+    },
+    tiktok: {
+      bg: '#000000',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><path d="M16.6 5.82c-.9-.6-1.55-1.55-1.75-2.66h-.01A5.2 5.2 0 0114.7 2h-3.03v13.4a2.6 2.6 0 11-1.84-2.49v-3.13a5.7 5.7 0 00-.76-.05A5.83 5.83 0 003 15.55a5.83 5.83 0 0010.7 3.2 5.8 5.8 0 00.93-3.2V8.9a8.3 8.3 0 004.85 1.56V7.44a5.2 5.2 0 01-2.88-1.62z" fill="#fff"/></svg>'
+    },
+    instagram: {
+      bg: 'radial-gradient(circle at 30% 110%, #FDF497 0%, #FD5949 45%, #D6249F 60%, #285AEB 90%)',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="5" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="3.6" stroke="#fff" stroke-width="1.6"/><circle cx="16.3" cy="7.7" r="1" fill="#fff"/></svg>'
+    },
+    youtube: {
+      bg: '#FF0000',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><path d="M9.8 8.4v7.2l6.4-3.6-6.4-3.6z" fill="#fff"/></svg>'
+    },
+    x: {
+      bg: '#000000',
+      svg: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 5l5.06 6.78L6.2 19h1.6l4.15-5.35L15.7 19H19l-5.3-7.08L18.2 5h-1.6l-3.83 4.93L9.3 5H6z" fill="#fff"/></svg>'
+    }
+  };
+
+  // ===================== STATE =====================
+  const params = new URLSearchParams(location.search);
+  const viewUserId = params.get('user_id');
+  const deepLinkItemId = params.get('item_id');
+
+  let profile = null;
+  let items = [];
+  let currentFilter = '';
+  let isOwner = false;
+  let session = { user_id:'', username:'', box_code:'' };
+  let pendingAction = null;
+
+  let selectedGender = ''; // unused here but kept for parity/safety
+  let addSelectedTypes = new Set();
+  let addItemImageUrl = '';
+  let editSelectedTypes = new Set();
+  let editItemImageUrl = '';
+  let editingItemId = null;
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  function normalizeImageUrl(url){
+    if(!url) return '';
+    const m = String(url).match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if(m) return 'https://drive.google.com/thumbnail?id=' + m[1] + '&sz=w1000';
+    const openMatch = String(url).match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if(openMatch) return 'https://drive.google.com/thumbnail?id=' + openMatch[1] + '&sz=w1000';
+    return url;
+  }
+
+  function normalizeLink(url){
+    if(!url) return '';
+    const trimmed = String(url).trim();
+    if(/^https?:\/\//i.test(trimmed)) return trimmed;
+    return 'https://' + trimmed;
+  }
+
+  // แปลงวันที่ไทย "24 ก.ค. 2569 14:34 น." กลับเป็น timestamp เพื่อใช้ sort ใหม่สุดอยู่บนสุด
+  function parseThaiDate(str){
+    if(!str) return 0;
+    const m = String(str).match(/^(\d{1,2})\s+(\S+)\s+(\d{4})\s+(\d{2}):(\d{2})/);
+    if(!m) return 0;
+    const day = parseInt(m[1],10);
+    const monthIdx = THAI_MONTHS_SHORT.indexOf(m[2]);
+    const yearAD = parseInt(m[3],10) - 543;
+    const hh = parseInt(m[4],10), mm = parseInt(m[5],10);
+    if(monthIdx < 0) return 0;
+    return new Date(yearAD, monthIdx, day, hh, mm).getTime();
+  }
+
+  function showMsg(id, text, type){
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+  function clearMsg(id){ document.getElementById(id).className = 'msg'; }
+
+  function toast(text){
+    const el = document.getElementById('toast');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  function showState(name){
+    ['stateLoading','statePrivate','stateNotFound','stateProfile'].forEach(id => {
+      document.getElementById(id).style.display = (id === name) ? 'block' : 'none';
+    });
+  }
+
+  // ===================== LOAD (public) =====================
+  async function loadPublicProfile(){
+    if(!viewUserId){ showState('stateNotFound'); return; }
+    showState('stateLoading');
+    try{
+      const res = await fetch(`${CONFIG.API_URL}?action=getProfile&user_id=${encodeURIComponent(viewUserId)}`);
+      const data = await res.json();
+      if(data.success){
+        profile = data.profile;
+        items = data.items || [];
+        isOwner = false;
+        renderAll();
+        showState('stateProfile');
+      }else if(data.message === 'โปรไฟล์นี้เป็นส่วนตัว'){
+        showState('statePrivate');
+      }else{
+        showState('stateNotFound');
+      }
+    }catch(err){
+      showState('stateNotFound');
+    }
+  }
+
+  // ===================== LOGIN / OWNER MODE =====================
+  function openLoginModal(action){
+    pendingAction = action || null;
+    clearMsg('loginMsg');
+    document.getElementById('loginModal').classList.add('show');
+  }
+  document.getElementById('btnLoginCancel').addEventListener('click', () => {
+    pendingAction = null;
+    document.getElementById('loginModal').classList.remove('show');
+  });
+  document.getElementById('btnOwnerLoginFromPrivate').addEventListener('click', () => openLoginModal('enterOwnerMode'));
+
+  document.getElementById('loginUsername').addEventListener('input', function(){
+    const pos = this.selectionStart; this.value = this.value.toLowerCase(); this.setSelectionRange(pos, pos);
+  });
+  document.getElementById('loginBoxCode').addEventListener('input', function(){ this.value = this.value.toUpperCase(); });
+
+  document.getElementById('btnLoginSubmit').addEventListener('click', async () => {
+    clearMsg('loginMsg');
+    const username = document.getElementById('loginUsername').value.trim();
+    const box_code = document.getElementById('loginBoxCode').value.trim();
+    if(!username || !box_code){ showMsg('loginMsg', 'กรุณากรอก username และ box code', 'error'); return; }
+
+    const btn = document.getElementById('btnLoginSubmit');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
+
+    try{
+      const res = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify({ action:'login', username, box_code }) });
+      const data = await res.json();
+      if(!data.success){
+        showMsg('loginMsg', data.message || 'เข้าสู่ระบบไม่สำเร็จ', 'error');
+        btn.disabled = false; btn.textContent = originalText;
+        return;
+      }
+      if(viewUserId && data.user_id !== viewUserId){
+        showMsg('loginMsg', 'บัญชีนี้ไม่ใช่เจ้าของโปรไฟล์นี้', 'error');
+        btn.disabled = false; btn.textContent = originalText;
+        return;
+      }
+
+      session = { user_id: data.user_id, username, box_code };
+
+      // โหลดโปรไฟล์แบบเจ้าของ (ได้ item ส่วนตัวมาด้วย)
+      const res2 = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({ action:'getMyProfile', user_id: session.user_id, username: session.username, box_code: session.box_code })
+      });
+      const data2 = await res2.json();
+      if(!data2.success){
+        showMsg('loginMsg', data2.message || 'โหลดโปรไฟล์ไม่สำเร็จ', 'error');
+        btn.disabled = false; btn.textContent = originalText;
+        return;
+      }
+
+      profile = data2.profile;
+      items = data2.items || [];
+      isOwner = true;
+
+      document.getElementById('loginModal').classList.remove('show');
+      btn.disabled = false; btn.textContent = originalText;
+
+      renderAll();
+      showState('stateProfile');
+
+      const action = pendingAction;
+      pendingAction = null;
+      if(action && action !== 'enterOwnerMode') runAction(action);
+
+    }catch(err){
+      showMsg('loginMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      btn.disabled = false; btn.textContent = originalText;
+    }
+  });
+
+  document.getElementById('btnLogoutOwner').addEventListener('click', () => {
+    session = { user_id:'', username:'', box_code:'' };
+    isOwner = false;
+    loadPublicProfile();
+  });
+
+  document.getElementById('btnGoFullEdit').addEventListener('click', () => {
+    location.href = 'edit.html';
+  });
+
+  function requireOwner(action){
+    if(isOwner) runAction(action);
+    else openLoginModal(action);
+  }
+
+  function runAction(action){
+    if(action === 'editAvatar') document.getElementById('avatarFileInput').click();
+    else if(action === 'addItem') openAddItemModal();
+    else if(action === 'toggleAccountPublic') doToggleAccountPublic();
+    else if(action.startsWith('editItem:')) openEditItemModal(action.split(':')[1]);
+    else if(action.startsWith('toggleItemPublic:')) doToggleItemPublic(action.split(':')[1]);
+  }
+
+  // ===================== RENDER =====================
+  function renderAll(){
+    renderProfileHead();
+    renderDashboard();
+    renderItems();
+    handleDeepLink();
+  }
+
+  function renderProfileHead(){
+    document.getElementById('profileUsername').innerHTML = esc(profile.username || '—') +
+      (profile.is_public === 'false' ? '<span class="priv-tag" id="privTag">ส่วนตัว</span>' : '');
+
+    const aboutEl = document.getElementById('profileAbout');
+    if(profile.about_me){ aboutEl.textContent = profile.about_me; aboutEl.style.display = 'block'; }
+    else{ aboutEl.style.display = 'none'; }
+
+    const img = document.getElementById('avatarImg');
+    const placeholder = document.getElementById('avatarPlaceholder');
+    const avatarUrl = normalizeImageUrl(profile.profile_image || '');
+    if(avatarUrl){
+      img.src = avatarUrl; img.style.display = 'block'; placeholder.style.display = 'none';
+    }else{
+      img.style.display = 'none'; placeholder.style.display = 'flex';
+    }
+
+    // social icons — โชว์เฉพาะที่มีข้อมูล ใช้ไอคอนแบรนด์จริงของแต่ละแพลตฟอร์ม
+    const socials = [
+      { key:'line', href: profile.line ? normalizeLink(profile.line) : '' },
+      { key:'facebook', href: profile.facebook ? normalizeLink(profile.facebook) : '' },
+      { key:'tiktok', href: profile.tiktok ? 'https://www.tiktok.com/@' + profile.tiktok.replace('@','') : '' },
+      { key:'instagram', href: profile.instagram ? 'https://www.instagram.com/' + profile.instagram.replace('@','') : '' },
+      { key:'youtube', href: profile.youtube ? normalizeLink(profile.youtube) : '' },
+      { key:'x', href: profile.x ? 'https://x.com/' + profile.x.replace('@','') : '' }
+    ].filter(s => s.href);
+    document.getElementById('socialRow').innerHTML = socials.map(s =>
+      `<a class="social-icon" style="background:${SOCIAL_ICONS[s.key].bg}" href="${esc(s.href)}" target="_blank" rel="noopener" aria-label="${s.key}">${SOCIAL_ICONS[s.key].svg}</a>`
+    ).join('');
+
+    // แสดงปุ่ม Edit / ปุ่มล็อกอิน เฉพาะเมื่อยืนยันตัวตนเป็นเจ้าของแล้วเท่านั้น — ผู้เข้าชมทั่วไปจะไม่เห็นปุ่มแก้ไขเกะกะเลย
+    document.getElementById('ownerToolbar').style.display = isOwner ? 'flex' : 'none';
+    document.getElementById('btnEditAvatar').style.display = isOwner ? 'flex' : 'none';
+    document.getElementById('btnHeaderLogin').style.display = isOwner ? 'none' : 'inline-flex';
+    if(isOwner){
+      document.getElementById('accountPublicToggle').checked = profile.is_public !== 'false';
+    }
+  }
+
+  document.getElementById('btnEditAvatar').addEventListener('click', () => requireOwner('editAvatar'));
+  document.getElementById('btnHeaderLogin').addEventListener('click', () => openLoginModal('enterOwnerMode'));
+
+  document.getElementById('accountPublicToggle').addEventListener('change', () => {
+    if(!isOwner){ loadPublicProfile(); return; }
+    doToggleAccountPublic();
+  });
+  async function doToggleAccountPublic(){
+    const newVal = document.getElementById('accountPublicToggle').checked;
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({ action:'updateProfile', user_id: session.user_id, username: session.username, box_code: session.box_code, is_public: newVal })
+      });
+      const data = await res.json();
+      if(data.success){
+        profile.is_public = newVal ? 'true' : 'false';
+        renderProfileHead();
+        toast(newVal ? 'เปิดโปรไฟล์สาธารณะแล้ว' : 'ตั้งโปรไฟล์เป็นส่วนตัวแล้ว');
+      }else{
+        toast(data.message || 'บันทึกไม่สำเร็จ');
+        document.getElementById('accountPublicToggle').checked = profile.is_public !== 'false';
+      }
+    }catch(err){
+      toast('เชื่อมต่อระบบไม่สำเร็จ');
+      document.getElementById('accountPublicToggle').checked = profile.is_public !== 'false';
+    }
+  }
+
+  document.getElementById('btnShareProfile').addEventListener('click', () => {
+    shareLink(`${location.origin}${location.pathname}?user_id=${profile.user_id}`, 'โปรไฟล์ของ ' + profile.username);
+  });
+
+  async function shareLink(url, title){
+    if(navigator.share){
+      try{ await navigator.share({ title, url }); return; }catch(err){ /* ผู้ใช้กดยกเลิก ก็เฉยๆ ไม่ต้อง fallback */ if(err.name === 'AbortError') return; }
+    }
+    try{
+      await navigator.clipboard.writeText(url);
+      toast('คัดลอกลิงก์แล้ว!');
+    }catch(err){
+      prompt('คัดลอกลิงก์นี้:', url);
+    }
+  }
+
+  // ===================== AVATAR UPLOAD =====================
+  function resizeImageFile(file, maxWidth){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxWidth / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+          resolve(dataUrl.split(',')[1]);
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadImageFile(file){
+    const base64 = await resizeImageFile(file, 1500);
+    const res = await fetch(CONFIG.API_URL, {
+      method:'POST',
+      body: JSON.stringify({ action:'uploadImage', image_base64: base64, mime_type:'image/jpeg', file_name:'memorery_' + Date.now() + '.jpg' })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.message || 'อัปโหลดรูปไม่สำเร็จ');
+    return data.url;
+  }
+
+  document.getElementById('avatarFileInput').addEventListener('change', async function(){
+    const file = this.files[0];
+    this.value = '';
+    if(!file) return;
+    toast('กำลังอัปโหลดรูป...');
+    try{
+      const url = await uploadImageFile(file);
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({ action:'updateProfile', user_id: session.user_id, username: session.username, box_code: session.box_code, profile_image: url })
+      });
+      const data = await res.json();
+      if(data.success){
+        profile.profile_image = url;
+        renderProfileHead();
+        toast('เปลี่ยนรูปโปรไฟล์แล้ว');
+      }else{
+        toast(data.message || 'บันทึกไม่สำเร็จ');
+      }
+    }catch(err){
+      toast('อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง');
+    }
+  });
+
+  // ===================== DASHBOARD (category pills) =====================
+  function renderDashboard(){
+    const counts = {};
+    items.forEach(i => (i.memory_types || '').split(',').filter(Boolean).forEach(k => counts[k] = (counts[k]||0) + 1));
+    const active = MEMORY_TYPES.filter(t => counts[t.key] > 0);
+
+    let html = `<span class="category-pill${currentFilter==='' ? ' selected':''}" data-key="">ทั้งหมด <b>${items.length}</b></span>`;
+    html += active.map(t => `<span class="category-pill${currentFilter===t.key ? ' selected':''}" data-key="${t.key}">${t.emoji} ${t.label} <b>${counts[t.key]}</b></span>`).join('');
+    document.getElementById('categoryPills').innerHTML = html;
+
+    document.querySelectorAll('#categoryPills .category-pill').forEach(el => {
+      el.addEventListener('click', () => {
+        currentFilter = el.dataset.key;
+        renderDashboard();
+        renderItems();
+      });
+    });
+  }
+
+  // ===================== ITEMS =====================
+  function renderItems(){
+    const grid = document.getElementById('itemsGrid');
+    const filtered = items
+      .filter(i => !currentFilter || (i.memory_types || '').split(',').includes(currentFilter))
+      .sort((a,b) => parseThaiDate(b.updated_at || b.created_at) - parseThaiDate(a.updated_at || a.created_at));
+
+    document.getElementById('itemCountLabel').textContent = items.length ? `${items.length} ชิ้น` : '';
+
+    let html = isOwner ? `
+      <div class="add-item-card" id="addItemCard">
+        <div class="plus-circle">＋</div>
+        <span>เพิ่มความทรงจำใหม่</span>
+      </div>` : '';
+
+    if(!filtered.length && !isOwner){
+      html += `<div class="empty-state">ยังไม่มีความทรงจำในหมวดนี้</div>`;
+    }else{
+      html += filtered.map(i => itemCardHtml(i)).join('');
+    }
+    grid.innerHTML = html;
+
+    if(isOwner) document.getElementById('addItemCard').addEventListener('click', () => requireOwner('addItem'));
+
+    // bind interactions ทีละใบ
+    filtered.forEach(i => {
+      const card = document.getElementById('item-' + i.item_id);
+      if(!card) return;
+
+      const media = card.querySelector('.item-media img');
+      if(media) media.addEventListener('click', () => openLightbox(media.src));
+
+      const descEl = card.querySelector('.item-desc');
+      const toggleBtn = card.querySelector('.desc-toggle');
+      if(descEl && toggleBtn){
+        requestAnimationFrame(() => {
+          if(descEl.scrollHeight > descEl.clientHeight + 2) toggleBtn.classList.add('show');
+        });
+        toggleBtn.addEventListener('click', () => {
+          const expanded = descEl.classList.toggle('expanded');
+          toggleBtn.textContent = expanded ? '▲ ย่อ' : '▼ อ่านเพิ่มเติม';
+        });
+      }
+
+      const shareBtn = card.querySelector('.btn-share-item');
+      if(shareBtn) shareBtn.addEventListener('click', () => {
+        shareLink(`${location.origin}${location.pathname}?user_id=${profile.user_id}&item_id=${i.item_id}`, 'ความทรงจำจาก ' + profile.username);
+      });
+
+      const editBtn = card.querySelector('.btn-edit-item');
+      if(editBtn) editBtn.addEventListener('click', () => requireOwner('editItem:' + i.item_id));
+
+      const toggle = card.querySelector('.item-public-toggle');
+      if(toggle) toggle.addEventListener('change', () => requireOwner('toggleItemPublic:' + i.item_id));
+    });
+  }
+
+  function itemCardHtml(i){
+    const types = (i.memory_types || '').split(',').filter(Boolean);
+    const typeChips = types.map(k => {
+      const t = MEMORY_TYPES.find(m => m.key === k);
+      return t ? `<span class="type-chip">${t.emoji} ${t.label}</span>` : '';
+    }).join('');
+    const tags = (i.tags || '').split(',').filter(Boolean);
+    const imgUrl = normalizeImageUrl(i.image || '');
+    const isPrivate = i.is_public === 'false';
+
+    return `
+      <div class="item-card" id="item-${i.item_id}">
+        ${imgUrl
+          ? `<div class="item-media"><img src="${esc(imgUrl)}" loading="lazy"></div>`
+          : `<div class="item-media no-image">🖼️</div>`}
+        <div class="item-body">
+          ${typeChips ? `<div class="item-types">${typeChips}</div>` : ''}
+          <div class="item-desc${i.description ? '' : ' empty'}">${i.description ? esc(i.description) : 'ไม่มีคำอธิบาย'}</div>
+          <button class="desc-toggle">▼ อ่านเพิ่มเติม</button>
+          ${tags.length ? `<div class="item-tags">${tags.map(t=>'#'+esc(t)).join(' ')}</div>` : ''}
+          <div class="item-footer">
+            <span class="item-date">${esc(i.updated_at || i.created_at || '')}</span>
+            ${isOwner && isPrivate ? `<span class="private-badge">ส่วนตัว</span>` : ''}
+          </div>
+          <div class="item-owner-row" style="${isOwner ? '' : 'display:none;'}">
+            <label class="switch mini" title="เปิด/ปิดสาธารณะ">
+              <input type="checkbox" class="item-public-toggle" data-item-id="${i.item_id}" ${!isPrivate ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+            <div style="display:flex; gap:6px;">
+              <button class="icon-btn btn-edit-item" aria-label="แก้ไข">✏️</button>
+              <button class="icon-btn btn-share-item" aria-label="แชร์">🔗</button>
+            </div>
+          </div>
+          <div style="${isOwner ? 'display:none;' : ''}">
+            <button class="icon-btn btn-share-item" aria-label="แชร์" style="margin-top:10px;">🔗</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async function doToggleItemPublic(item_id){
+    const item = items.find(i => i.item_id === item_id);
+    if(!item) return;
+    const newVal = item.is_public === 'false'; // สลับค่าเดิม
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({ action:'updateItem', item_id, user_id: session.user_id, username: session.username, box_code: session.box_code, is_public: newVal })
+      });
+      const data = await res.json();
+      if(data.success){
+        item.is_public = newVal ? 'true' : 'false';
+        renderItems();
+        toast(newVal ? 'เปิดสาธารณะแล้ว' : 'ตั้งเป็นส่วนตัวแล้ว');
+      }else{
+        toast(data.message || 'บันทึกไม่สำเร็จ');
+        renderItems();
+      }
+    }catch(err){
+      toast('เชื่อมต่อระบบไม่สำเร็จ');
+      renderItems();
+    }
+  }
+
+  // ===================== ADD ITEM MODAL =====================
+  function initTypeGrid(gridId, selectedSet){
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    MEMORY_TYPES.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'type-pill';
+      el.textContent = `${t.emoji} ${t.label}`;
+      el.dataset.key = t.key;
+      el.addEventListener('click', () => {
+        if(selectedSet.has(t.key)){ selectedSet.delete(t.key); el.classList.remove('selected'); }
+        else{ selectedSet.add(t.key); el.classList.add('selected'); }
+      });
+      grid.appendChild(el);
+    });
+  }
+  initTypeGrid('addTypeGrid', addSelectedTypes);
+  initTypeGrid('editTypeGrid', editSelectedTypes);
+
+  function openAddItemModal(){
+    clearMsg('addItemMsg');
+    addSelectedTypes = new Set();
+    initTypeGrid('addTypeGrid', addSelectedTypes);
+    addItemImageUrl = '';
+    document.getElementById('addItemImg').style.display = 'none';
+    document.getElementById('addItemImagePlus').style.display = 'block';
+    document.getElementById('addItemImageLabel').style.display = 'block';
+    document.getElementById('addDescriptionInput').value = '';
+    document.querySelectorAll('.add-tag-input').forEach(el => el.value = '');
+    document.getElementById('addItemIsPublicInput').checked = true;
+    document.getElementById('addItemModal').classList.add('show');
+  }
+  document.getElementById('btnCancelAddItem').addEventListener('click', () => {
+    document.getElementById('addItemModal').classList.remove('show');
+  });
+  document.getElementById('addItemImagePreview').addEventListener('click', () => document.getElementById('addItemFile').click());
+  document.getElementById('addItemFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    if(!file) return;
+    const plus = document.getElementById('addItemImagePlus');
+    const label = document.getElementById('addItemImageLabel');
+    const img = document.getElementById('addItemImg');
+    const spinner = document.getElementById('addItemImageSpinner');
+    plus.style.display = 'none'; label.style.display = 'none'; spinner.classList.add('show');
+    try{
+      const url = await uploadImageFile(file);
+      addItemImageUrl = url;
+      img.src = url; img.style.display = 'block';
+    }catch(err){
+      showMsg('addItemMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      if(!addItemImageUrl){ plus.style.display = 'block'; label.style.display = 'block'; }
+    }
+    spinner.classList.remove('show');
+  });
+
+  document.getElementById('btnSaveAddItem').addEventListener('click', async () => {
+    clearMsg('addItemMsg');
+    const tags = Array.from(document.querySelectorAll('.add-tag-input')).map(i => i.value.trim()).filter(Boolean);
+    const description = document.getElementById('addDescriptionInput').value.trim();
+    if(addSelectedTypes.size === 0){ showMsg('addItemMsg', 'กรุณาเลือก Memory Type อย่างน้อย 1 อย่าง', 'error'); return; }
+    if(tags.length === 0){ showMsg('addItemMsg', 'กรุณากรอก Tag อย่างน้อย 1 อัน', 'error'); return; }
+
+    const btn = document.getElementById('btnSaveAddItem');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
+
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({
+          action:'createItem', user_id: session.user_id, username: session.username, box_code: session.box_code,
+          memory_types: Array.from(addSelectedTypes), image: addItemImageUrl, description, tags,
+          is_public: document.getElementById('addItemIsPublicInput').checked
+        })
+      });
+      const data = await res.json();
+      if(data.success){
+        document.getElementById('addItemModal').classList.remove('show');
+        await refreshOwnerItems();
+        toast('เพิ่มความทรงจำใหม่แล้ว');
+      }else{
+        showMsg('addItemMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
+      }
+    }catch(err){
+      showMsg('addItemMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+    btn.disabled = false; btn.textContent = originalText;
+  });
+
+  // ===================== EDIT ITEM MODAL =====================
+  function openEditItemModal(item_id){
+    const item = items.find(i => i.item_id === item_id);
+    if(!item) return;
+    editingItemId = item_id;
+    clearMsg('editItemMsg');
+
+    editSelectedTypes = new Set((item.memory_types || '').split(',').filter(Boolean));
+    initTypeGrid('editTypeGrid', editSelectedTypes);
+
+    editItemImageUrl = item.image || '';
+    const img = document.getElementById('editItemImg');
+    const plus = document.getElementById('editItemImagePlus');
+    const label = document.getElementById('editItemImageLabel');
+    if(editItemImageUrl){
+      img.src = normalizeImageUrl(editItemImageUrl); img.style.display = 'block';
+      plus.style.display = 'none'; label.style.display = 'none';
+    }else{
+      img.style.display = 'none'; img.src = '';
+      plus.style.display = 'block'; label.style.display = 'block';
+    }
+
+    document.getElementById('editDescriptionInput').value = item.description || '';
+    const tags = (item.tags || '').split(',').filter(Boolean);
+    document.querySelectorAll('.edit-tag-input').forEach((el, idx) => { el.value = tags[idx] || ''; });
+    document.getElementById('editItemIsPublicInput').checked = item.is_public !== 'false';
+
+    document.getElementById('editItemModal').classList.add('show');
+  }
+  document.getElementById('btnCancelEditItem').addEventListener('click', () => {
+    document.getElementById('editItemModal').classList.remove('show');
+    editingItemId = null;
+  });
+  document.getElementById('editItemImagePreview').addEventListener('click', () => document.getElementById('editItemFile').click());
+  document.getElementById('editItemFile').addEventListener('change', async function(){
+    const file = this.files[0];
+    if(!file) return;
+    const plus = document.getElementById('editItemImagePlus');
+    const label = document.getElementById('editItemImageLabel');
+    const img = document.getElementById('editItemImg');
+    const spinner = document.getElementById('editItemImageSpinner');
+    plus.style.display = 'none'; label.style.display = 'none'; spinner.classList.add('show');
+    try{
+      const url = await uploadImageFile(file);
+      editItemImageUrl = url;
+      img.src = url; img.style.display = 'block';
+    }catch(err){
+      showMsg('editItemMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+      if(!editItemImageUrl){ plus.style.display = 'block'; label.style.display = 'block'; }
+    }
+    spinner.classList.remove('show');
+  });
+
+  document.getElementById('btnSaveEditItem').addEventListener('click', async () => {
+    clearMsg('editItemMsg');
+    const tags = Array.from(document.querySelectorAll('.edit-tag-input')).map(i => i.value.trim()).filter(Boolean);
+    const description = document.getElementById('editDescriptionInput').value.trim();
+    if(editSelectedTypes.size === 0){ showMsg('editItemMsg', 'กรุณาเลือก Memory Type อย่างน้อย 1 อย่าง', 'error'); return; }
+    if(tags.length === 0){ showMsg('editItemMsg', 'กรุณากรอก Tag อย่างน้อย 1 อัน', 'error'); return; }
+
+    const btn = document.getElementById('btnSaveEditItem');
+    const originalText = btn.textContent;
+    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
+
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({
+          action:'updateItem', item_id: editingItemId, user_id: session.user_id, username: session.username, box_code: session.box_code,
+          memory_types: Array.from(editSelectedTypes), image: editItemImageUrl, description, tags,
+          is_public: document.getElementById('editItemIsPublicInput').checked
+        })
+      });
+      const data = await res.json();
+      if(data.success){
+        document.getElementById('editItemModal').classList.remove('show');
+        editingItemId = null;
+        await refreshOwnerItems();
+        toast('บันทึกการแก้ไขแล้ว');
+      }else{
+        showMsg('editItemMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
+      }
+    }catch(err){
+      showMsg('editItemMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
+    }
+    btn.disabled = false; btn.textContent = originalText;
+  });
+
+  async function refreshOwnerItems(){
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({ action:'getMyProfile', user_id: session.user_id, username: session.username, box_code: session.box_code })
+      });
+      const data = await res.json();
+      if(data.success){
+        profile = data.profile;
+        items = data.items || [];
+        renderAll();
+      }
+    }catch(err){ /* เงียบไว้ ไม่รบกวนผู้ใช้ */ }
+  }
+
+  // ===================== LIGHTBOX =====================
+  function openLightbox(src){
+    if(!src) return;
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightbox').classList.add('show');
+  }
+  function closeLightbox(){ document.getElementById('lightbox').classList.remove('show'); }
+
+  // ===================== DEEP LINK ไปยัง item เฉพาะ =====================
+  function handleDeepLink(){
+    if(!deepLinkItemId) return;
+    const card = document.getElementById('item-' + deepLinkItemId);
+    if(!card) return;
+    setTimeout(() => {
+      card.scrollIntoView({ behavior:'smooth', block:'center' });
+      card.classList.add('highlight');
+      const descEl = card.querySelector('.item-desc');
+      const toggleBtn = card.querySelector('.desc-toggle');
+      if(descEl && !descEl.classList.contains('expanded')){
+        descEl.classList.add('expanded');
+        if(toggleBtn){ toggleBtn.classList.add('show'); toggleBtn.textContent = '▲ ย่อ'; }
+      }
+      setTimeout(() => card.classList.remove('highlight'), 2600);
+    }, 150);
+  }
+
+  // ===================== INIT =====================
+  loadPublicProfile();
+</script>
+
+</body>
+</html>
