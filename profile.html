@@ -23,10 +23,7 @@
   button{ font-family:'Inter',sans-serif; }
 
   header{ padding:20px 24px; display:flex; align-items:center; justify-content:space-between; max-width:900px; margin:0 auto; gap:12px; }
-  .header-left{ display:flex; align-items:center; gap:18px; }
   .logo{ font-size:22px; }
-  .header-link{ font-size:13.5px; color:var(--text-soft); font-weight:600; }
-  .header-link:hover{ color:var(--primary); }
   .header-login-btn{
     display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
     color:var(--accent); border:1.5px solid var(--accent); background:transparent;
@@ -112,11 +109,13 @@
   .switch.mini input:checked + .slider::before{ transform:translateX(14px); }
   .toolbar-link{ font-size:13px; font-weight:600; color:var(--text-soft); cursor:pointer; }
   .toolbar-link:hover{ color:var(--primary); }
-  .share-btn{
-    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600;
-    color:var(--text-soft); cursor:pointer; background:transparent; border:none;
+  .share-pill{
+    display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:700;
+    color:var(--text-soft); cursor:pointer; background:var(--surface); border:1.5px solid var(--border);
+    border-radius:999px; padding:10px 20px; transition:all .15s;
   }
-  .share-btn:hover{ color:var(--primary); }
+  .share-pill:hover{ border-color:var(--primary); color:var(--primary); }
+  .share-pill.sm{ padding:7px 14px; font-size:12.5px; gap:5px; }
 
   .just-share{ display:flex; justify-content:center; margin-bottom:28px; }
 
@@ -186,9 +185,9 @@
   .item-date{ font-size:11px; color:var(--muted); }
   .private-badge{ font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:2px 8px; }
 
+  .item-share-row{ margin-top:12px; padding-top:12px; border-top:1px solid var(--border); display:flex; }
   .item-owner-row{
-    display:flex; align-items:center; justify-content:space-between; gap:8px;
-    margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px;
   }
   .icon-btn{
     width:32px; height:32px; border-radius:50%; border:1.5px solid var(--border);
@@ -282,10 +281,7 @@
 <body>
 
 <header>
-  <div class="header-left">
-    <a href="index.html" class="logo wordmark"><span class="cap">M</span>eMorery</a>
-    <a href="index.html" class="header-link">← กลับหน้าแรก</a>
-  </div>
+  <a href="index.html" class="logo wordmark"><span class="cap">M</span>eMorery</a>
   <button class="header-login-btn" id="btnHeaderLogin" style="display:none;">🔑 เข้าสู่ระบบเจ้าของโปรไฟล์</button>
 </header>
 
@@ -340,7 +336,7 @@
       </div>
 
       <div class="just-share">
-        <button class="share-btn" id="btnShareProfile">🔗 แชร์โปรไฟล์นี้</button>
+        <button class="share-pill" id="btnShareProfile">🔗 Share this profile</button>
       </div>
     </div>
 
@@ -586,6 +582,42 @@
     el._t = setTimeout(() => el.classList.remove('show'), 2200);
   }
 
+  // ===================== SESSION PERSISTENCE (sessionStorage) =====================
+  // เก็บ session ไว้แค่ในแท็บเบราว์เซอร์นี้ตลอดจนกว่าจะปิดแท็บ (ไม่ใช่ localStorage ถาวร)
+  // ใช้เพื่อไม่ให้ผู้ใช้ต้อง login ซ้ำทันทีหลังสร้างโปรไฟล์เสร็จ หรือรีเฟรชหน้าเดิมซ้ำ
+  const SESSION_KEY = 'mm_owner_session';
+  function saveSession(s){
+    try{ sessionStorage.setItem(SESSION_KEY, JSON.stringify(s)); }catch(err){ /* เงียบไว้ ไม่กระทบการใช้งานหลัก */ }
+  }
+  function loadStoredSession(){
+    try{ const raw = sessionStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; }catch(err){ return null; }
+  }
+  function clearStoredSession(){
+    try{ sessionStorage.removeItem(SESSION_KEY); }catch(err){ /* เงียบไว้ */ }
+  }
+
+  // พยายาม login แบบเงียบๆ ด้วย session ที่เก็บไว้ ก่อนจะโชว์หน้าแบบ public/ปุ่ม login
+  async function trySilentOwnerLogin(stored){
+    try{
+      const res = await fetch(CONFIG.API_URL, {
+        method:'POST',
+        body: JSON.stringify({ action:'getMyProfile', user_id: stored.user_id, username: stored.username, box_code: stored.box_code })
+      });
+      const data = await res.json();
+      if(!data.success) { clearStoredSession(); return false; }
+
+      session = stored;
+      profile = data.profile;
+      items = data.items || [];
+      isOwner = true;
+      renderAll();
+      showState('stateProfile');
+      return true;
+    }catch(err){
+      return false;
+    }
+  }
+
   function showState(name){
     ['stateLoading','statePrivate','stateNotFound','stateProfile'].forEach(id => {
       document.getElementById(id).style.display = (id === name) ? 'block' : 'none';
@@ -613,6 +645,20 @@
     }catch(err){
       showState('stateNotFound');
     }
+  }
+
+  // ===================== INIT ENTRY =====================
+  // ถ้ามี session ที่เก็บไว้ในแท็บนี้ตรงกับ user_id ที่กำลังดู ให้ลอง login เงียบๆ ก่อน
+  // เพื่อไม่ให้ผู้ใช้ต้อง login ซ้ำหลังเพิ่งสร้างโปรไฟล์เสร็จ หรือรีเฟรชหน้าเดิม
+  async function init(){
+    if(!viewUserId){ showState('stateNotFound'); return; }
+    showState('stateLoading');
+    const stored = loadStoredSession();
+    if(stored && stored.user_id === viewUserId){
+      const ok = await trySilentOwnerLogin(stored);
+      if(ok) return;
+    }
+    loadPublicProfile();
   }
 
   // ===================== LOGIN / OWNER MODE =====================
@@ -657,6 +703,7 @@
       }
 
       session = { user_id: data.user_id, username, box_code };
+      saveSession(session);
 
       // โหลดโปรไฟล์แบบเจ้าของ (ได้ item ส่วนตัวมาด้วย)
       const res2 = await fetch(CONFIG.API_URL, {
@@ -693,6 +740,7 @@
   document.getElementById('btnLogoutOwner').addEventListener('click', () => {
     session = { user_id:'', username:'', box_code:'' };
     isOwner = false;
+    clearStoredSession();
     loadPublicProfile();
   });
 
@@ -790,18 +838,24 @@
   }
 
   document.getElementById('btnShareProfile').addEventListener('click', () => {
-    shareLink(`${location.origin}${location.pathname}?user_id=${profile.user_id}`, 'โปรไฟล์ของ ' + profile.username);
+    shareLink(
+      `${location.origin}${location.pathname}?user_id=${profile.user_id}`,
+      'ความทรงจำของ ' + profile.username + ' — MeMorery',
+      `ร่วมดูความทรงจำประทับใจของ "${profile.username}"`
+    );
   });
 
-  async function shareLink(url, title){
+  // url = ลิงก์ที่จะแชร์ / title = หัวเรื่อง (ใช้กับ navigator.share) / introText = ข้อความเกริ่นก่อนลิงก์ ให้ผู้รับเห็นก่อนกดเข้าไป
+  async function shareLink(url, title, introText){
     if(navigator.share){
-      try{ await navigator.share({ title, url }); return; }catch(err){ /* ผู้ใช้กดยกเลิก ก็เฉยๆ ไม่ต้อง fallback */ if(err.name === 'AbortError') return; }
+      try{ await navigator.share({ title, text: introText, url }); return; }catch(err){ /* ผู้ใช้กดยกเลิก ก็เฉยๆ ไม่ต้อง fallback */ if(err.name === 'AbortError') return; }
     }
+    const combined = introText ? `${introText}\n${url}` : url;
     try{
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(combined);
       toast('คัดลอกลิงก์แล้ว!');
     }catch(err){
-      prompt('คัดลอกลิงก์นี้:', url);
+      prompt('คัดลอกข้อความนี้:', combined);
     }
   }
 
@@ -928,7 +982,11 @@
 
       const shareBtn = card.querySelector('.btn-share-item');
       if(shareBtn) shareBtn.addEventListener('click', () => {
-        shareLink(`${location.origin}${location.pathname}?user_id=${profile.user_id}&item_id=${i.item_id}`, 'ความทรงจำจาก ' + profile.username);
+        shareLink(
+          `${location.origin}${location.pathname}?user_id=${profile.user_id}&item_id=${i.item_id}`,
+          'ความทรงจำของ ' + profile.username + ' — MeMorery',
+          `ร่วมดูความทรงจำนี้ของ "${profile.username}"`
+        );
       });
 
       const editBtn = card.querySelector('.btn-edit-item');
@@ -963,18 +1021,15 @@
             <span class="item-date">${esc(i.updated_at || i.created_at || '')}</span>
             ${isOwner && isPrivate ? `<span class="private-badge">ส่วนตัว</span>` : ''}
           </div>
+          <div class="item-share-row">
+            <button class="share-pill sm btn-share-item">🔗 Share</button>
+          </div>
           <div class="item-owner-row" style="${isOwner ? '' : 'display:none;'}">
             <label class="switch mini" title="เปิด/ปิดสาธารณะ">
               <input type="checkbox" class="item-public-toggle" data-item-id="${i.item_id}" ${!isPrivate ? 'checked' : ''}>
               <span class="slider"></span>
             </label>
-            <div style="display:flex; gap:6px;">
-              <button class="icon-btn btn-edit-item" aria-label="แก้ไข">✏️</button>
-              <button class="icon-btn btn-share-item" aria-label="แชร์">🔗</button>
-            </div>
-          </div>
-          <div style="${isOwner ? 'display:none;' : ''}">
-            <button class="icon-btn btn-share-item" aria-label="แชร์" style="margin-top:10px;">🔗</button>
+            <button class="icon-btn btn-edit-item" aria-label="แก้ไข">✏️</button>
           </div>
         </div>
       </div>
@@ -1223,8 +1278,8 @@
     }, 150);
   }
 
-  // ===================== INIT =====================
-  loadPublicProfile();
+  // ===================== START =====================
+  init();
 </script>
 
 </body>
