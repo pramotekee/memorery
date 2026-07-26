@@ -590,6 +590,7 @@
         session.username = username;
         session.box_code = box_code;
         session.user_id = data.user_id;
+        try{ sessionStorage.setItem('mm_owner_session', JSON.stringify(session)); }catch(err){ /* เงียบไว้ ไม่กระทบ flow หลัก */ }
         await loadMyProfile();
         document.getElementById('screenLogin').style.display = 'none';
         document.getElementById('screenEdit').style.display = 'block';
@@ -605,6 +606,7 @@
 
   document.getElementById('btnLogout').addEventListener('click', () => {
     session = { box_code:'', username:'', user_id:'' };
+    try{ sessionStorage.removeItem('mm_owner_session'); }catch(err){ /* เงียบไว้ */ }
     document.getElementById('loginUsername').value = '';
     document.getElementById('loginBoxCode').value = '';
     document.getElementById('screenEdit').style.display = 'none';
@@ -850,6 +852,29 @@
   initProvinces();
   initGenderPills();
   initEditTypeGrid();
+
+  // ===================== AUTO-LOGIN จาก session ที่แชร์กับหน้า profile.html =====================
+  // ถ้า user login เป็นเจ้าของไว้แล้วในแท็บนี้ (เช่น กด "แก้ไขโปรไฟล์" มาจากหน้า profile.html)
+  // ให้เข้าสู่หน้าแก้ไขได้เลยทันที ไม่ต้องกรอก username/box code ซ้ำเป็นครั้งที่สอง
+  (async function tryAutoLoginFromSharedSession(){
+    let stored = null;
+    try{
+      const raw = sessionStorage.getItem('mm_owner_session');
+      stored = raw ? JSON.parse(raw) : null;
+    }catch(err){ stored = null; }
+    if(!stored || !stored.user_id || !stored.username || !stored.box_code) return;
+
+    session = stored;
+    try{
+      await loadMyProfile();
+      document.getElementById('screenLogin').style.display = 'none';
+      document.getElementById('screenEdit').style.display = 'block';
+    }catch(err){
+      // session เก่าใช้ไม่ได้แล้ว (เช่น box code ถูกเปลี่ยน) ล้างทิ้งแล้วให้กรอก login ตามปกติ
+      session = { box_code:'', username:'', user_id:'' };
+      try{ sessionStorage.removeItem('mm_owner_session'); }catch(e){ /* เงียบไว้ */ }
+    }
+  })();
 </script>
 
 </body>
