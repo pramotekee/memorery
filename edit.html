@@ -109,6 +109,7 @@
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
   .btn .spinner-ring{ width:17px; height:17px; border-width:2.5px; border-top-color:#fff; }
+  .state-box{ text-align:center; padding:80px 20px; color:var(--text-soft); }
 
   /* ---------- Gender pills / memory type pills ---------- */
   .pill-group{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
@@ -213,8 +214,14 @@
 
 <div class="wrap">
 
+  <!-- ===================== SCREEN 0: LOADING (เช็ค session ก่อนตัดสินใจว่าจะโชว์อะไร) ===================== -->
+  <div id="screenLoading" class="state-box">
+    <div class="spinner-ring" style="margin:0 auto;"></div>
+    <p style="margin-top:16px;">กำลังตรวจสอบสิทธิ์...</p>
+  </div>
+
   <!-- ===================== SCREEN 1: LOGIN ===================== -->
-  <div id="screenLogin">
+  <div id="screenLogin" style="display:none;">
     <h1 class="page-title">เข้าสู่ระบบเพื่อแก้ไข</h1>
     <p class="page-sub">กรอก username และ box code เดิมที่ใช้ตอนสร้างโปรไฟล์</p>
     <div class="card">
@@ -854,25 +861,34 @@
   initEditTypeGrid();
 
   // ===================== AUTO-LOGIN จาก session ที่แชร์กับหน้า profile.html =====================
-  // ถ้า user login เป็นเจ้าของไว้แล้วในแท็บนี้ (เช่น กด "แก้ไขโปรไฟล์" มาจากหน้า profile.html)
-  // ให้เข้าสู่หน้าแก้ไขได้เลยทันที ไม่ต้องกรอก username/box code ซ้ำเป็นครั้งที่สอง
-  (async function tryAutoLoginFromSharedSession(){
+  // หน้านี้เริ่มต้นด้วย "กำลังตรวจสอบสิทธิ์..." เสมอ (ไม่โชว์ฟอร์ม login วาบขึ้นมาก่อน)
+  // ถ้ามี session ของเจ้าของโปรไฟล์ค้างอยู่ในแท็บนี้ (เช่น กด "แก้ไขโปรไฟล์" มาจากหน้า profile.html)
+  // จะพาเข้าหน้าแก้ไขตรงๆ ทันทีที่ยืนยันเสร็จ ไม่ต้องกรอก username/box code ซ้ำเป็นครั้งที่สอง
+  (async function initAuthGate(){
     let stored = null;
     try{
       const raw = sessionStorage.getItem('mm_owner_session');
       stored = raw ? JSON.parse(raw) : null;
     }catch(err){ stored = null; }
-    if(!stored || !stored.user_id || !stored.username || !stored.box_code) return;
+
+    if(!stored || !stored.user_id || !stored.username || !stored.box_code){
+      // ไม่มี session ค้างเลย รู้ผลได้ทันทีไม่ต้องรอ ไปหน้า login ตามปกติ
+      document.getElementById('screenLoading').style.display = 'none';
+      document.getElementById('screenLogin').style.display = 'block';
+      return;
+    }
 
     session = stored;
     try{
       await loadMyProfile();
-      document.getElementById('screenLogin').style.display = 'none';
+      document.getElementById('screenLoading').style.display = 'none';
       document.getElementById('screenEdit').style.display = 'block';
     }catch(err){
       // session เก่าใช้ไม่ได้แล้ว (เช่น box code ถูกเปลี่ยน) ล้างทิ้งแล้วให้กรอก login ตามปกติ
       session = { box_code:'', username:'', user_id:'' };
       try{ sessionStorage.removeItem('mm_owner_session'); }catch(e){ /* เงียบไว้ */ }
+      document.getElementById('screenLoading').style.display = 'none';
+      document.getElementById('screenLogin').style.display = 'block';
     }
   })();
 </script>
