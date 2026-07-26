@@ -97,7 +97,9 @@
     background:var(--bg); border:1px solid var(--border); border-radius:999px;
     padding:2px 10px; margin-left:8px; vertical-align:middle;
   }
-  .profile-about{ font-size:14px; color:var(--text-soft); max-width:480px; margin:0; text-align:left; white-space:pre-line; }
+  .profile-about{ font-size:14px; color:var(--text-soft); max-width:none; margin:0; text-align:left; white-space:pre-line; }
+  .about-section{ margin-top:20px; padding-top:18px; border-top:1px solid var(--border); }
+  .about-heading{ font-family:'Lexend',sans-serif; font-weight:700; font-size:14px; color:var(--text); margin-bottom:8px; }
 
   .social-row{ display:flex; justify-content:flex-start; gap:10px; flex-wrap:wrap; margin-top:18px; }
   .social-icon{
@@ -120,9 +122,13 @@
   .switch.mini{ width:34px; height:20px; }
   .switch.mini .slider::before{ width:14px; height:14px; }
   .switch.mini input:checked + .slider::before{ transform:translateX(14px); }
-  .toolbar-link{ font-size:12.5px; font-weight:600; color:var(--text-soft); cursor:pointer; white-space:nowrap; }
-  .toolbar-link:hover{ color:var(--primary); }
-  .toolbar-link.danger:hover{ color:var(--danger); }
+  .menu-pill{
+    display:inline-flex; align-items:center; font-size:12.5px; font-weight:600; color:var(--text-soft);
+    background:var(--bg); border:1px solid var(--border); border-radius:999px; padding:6px 14px;
+    cursor:pointer; white-space:nowrap; transition:all .15s;
+  }
+  .menu-pill:hover{ border-color:var(--primary); color:var(--primary); }
+  .menu-pill.danger:hover{ border-color:var(--danger); color:var(--danger); }
   .share-pill{
     display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:700;
     color:var(--text-soft); cursor:pointer; background:var(--bg); border:1.5px solid var(--border);
@@ -338,7 +344,6 @@
           </div>
           <div class="profile-identity-text">
             <div class="profile-username" id="profileUsername">—<span class="priv-tag" id="privTag" style="display:none;">ส่วนตัว</span></div>
-            <div class="profile-about" id="profileAbout" style="display:none;"></div>
           </div>
         </div>
 
@@ -350,9 +355,14 @@
               <span class="slider"></span>
             </label>
           </div>
-          <span class="toolbar-link" id="btnGoFullEdit">แก้ไขข้อมูลโปรไฟล์</span>
-          <span class="toolbar-link danger" id="btnLogoutOwner">ออกจากระบบ</span>
+          <span class="menu-pill" id="btnGoFullEdit">แก้ไขโปรไฟล์</span>
+          <span class="menu-pill danger" id="btnLogoutOwner">ออกจากระบบ</span>
         </div>
+      </div>
+
+      <div class="about-section" id="aboutSection" style="display:none;">
+        <div class="about-heading">About Me</div>
+        <div class="profile-about" id="profileAbout"></div>
       </div>
 
       <div class="social-row" id="socialRow"></div>
@@ -809,8 +819,9 @@
       (profile.is_public === 'false' ? '<span class="priv-tag" id="privTag">ส่วนตัว</span>' : '');
 
     const aboutEl = document.getElementById('profileAbout');
-    if(profile.about_me){ aboutEl.textContent = profile.about_me; aboutEl.style.display = 'block'; }
-    else{ aboutEl.style.display = 'none'; }
+    const aboutSection = document.getElementById('aboutSection');
+    if(profile.about_me){ aboutEl.textContent = profile.about_me; aboutSection.style.display = 'block'; }
+    else{ aboutSection.style.display = 'none'; }
 
     const img = document.getElementById('avatarImg');
     const placeholder = document.getElementById('avatarPlaceholder');
