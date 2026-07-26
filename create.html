@@ -42,6 +42,8 @@
   .page-sub{ color:var(--text-soft); font-size:14.5px; margin-bottom:28px; }
 
   .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow); margin-bottom:20px; }
+  .code-login-link{ display:block; text-align:center; font-size:13.5px; font-weight:600; color:var(--accent); margin-top:16px; }
+  .code-login-link:hover{ color:var(--primary); text-decoration:underline; }
 
   label{ display:block; font-size:13.5px; font-weight:600; color:var(--text-soft); margin-bottom:7px; }
   input[type="text"], input[type="date"], select, textarea{
@@ -195,10 +197,11 @@
     <h1 class="page-title">กรอกรหัสกล่องของคุณ</h1>
     <p class="page-sub">รหัส 8 หลักที่แปะอยู่หลังกล่อง MeMorery ของคุณ</p>
     <div class="card">
-      <div class="msg" id="codeMsg"></div>
       <label>Box Code</label>
       <input type="text" id="boxCodeInput" class="code-input" maxlength="8" placeholder="7K4M92FQ">
+      <div class="msg" id="codeMsg"></div>
       <button class="btn btn-primary" id="btnCheckCode">ตรวจสอบรหัส</button>
+      <a href="edit.html" class="code-login-link">มีโปรไฟล์อยู่แล้ว? เข้าสู่ระบบ →</a>
     </div>
   </div>
 
@@ -529,7 +532,10 @@
         session.box_code = code;
         showStep(2);
       }else{
-        showMsg('codeMsg', data.message || 'รหัสไม่ถูกต้อง', 'error');
+        const msgText = data.used
+          ? 'box code นี้ถูกใช้สร้างโปรไฟล์ไปแล้ว กรุณา "เข้าสู่ระบบ" เพื่อจัดการโปรไฟล์ของคุณจากเมนูด้านล่างนี้'
+          : (data.message || 'รหัสไม่ถูกต้อง');
+        showMsg('codeMsg', msgText, 'error');
       }
     }catch(err){
       showMsg('codeMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
