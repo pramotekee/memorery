@@ -190,7 +190,7 @@
     border-radius:999px; padding:3px 10px; color:var(--text-soft);
   }
   .item-desc{
-    font-size:13.8px; color:var(--text); margin-bottom:4px;
+    font-size:13.8px; color:var(--text); margin-bottom:4px; white-space:pre-line;
     display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
   }
   .item-desc.expanded{ -webkit-line-clamp:unset; overflow:visible; }
@@ -248,7 +248,7 @@
     font-size:15px; color:var(--text); margin-bottom:18px; outline:none; transition:border-color .15s;
   }
   input:focus, textarea:focus{ border-color:var(--primary); }
-  textarea{ resize:vertical; min-height:80px; }
+  textarea{ resize:vertical; min-height:160px; }
   .code-input{ font-family:'Lexend',sans-serif; font-weight:700; font-size:22px; letter-spacing:0.15em; text-align:center; text-transform:uppercase; }
 
   .msg{ font-size:13.5px; padding:12px 14px; border-radius:10px; margin-bottom:16px; display:none; }
@@ -1115,7 +1115,7 @@
     grid.innerHTML = '';
     MEMORY_TYPES.forEach(t => {
       const el = document.createElement('div');
-      el.className = 'type-pill';
+      el.className = 'type-pill' + (selectedSet.has(t.key) ? ' selected' : '');
       el.textContent = `${t.emoji} ${t.label}`;
       el.dataset.key = t.key;
       el.addEventListener('click', () => {
