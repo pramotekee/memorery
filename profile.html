@@ -63,36 +63,43 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
 
   /* ---------- profile header ---------- */
-  .profile-head{ text-align:center; padding:20px 0 8px; }
-  .avatar-wrap{ position:relative; width:104px; height:104px; margin:0 auto 16px; }
+  .profile-card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px 24px; margin:20px 0 28px;
+  }
+  .profile-card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .profile-identity{ display:flex; align-items:center; gap:16px; text-align:left; min-width:0; }
+  .profile-identity-text{ text-align:left; min-width:0; }
+
+  .avatar-wrap{ position:relative; width:84px; height:84px; margin:0; flex-shrink:0; }
   .avatar-big{
-    width:104px; height:104px; border-radius:50%; object-fit:cover;
-    background:var(--surface); border:3px solid var(--surface); box-shadow:0 0 0 1px var(--border);
+    width:84px; height:84px; border-radius:50%; object-fit:cover;
+    background:var(--bg); border:3px solid var(--bg); box-shadow:0 0 0 1px var(--border);
     cursor:zoom-in;
   }
   .avatar-placeholder{
-    width:104px; height:104px; border-radius:50%; background:var(--surface);
-    border:3px solid var(--surface); box-shadow:0 0 0 1px var(--border);
-    display:flex; align-items:center; justify-content:center; font-size:36px; color:var(--muted);
+    width:84px; height:84px; border-radius:50%; background:var(--bg);
+    border:3px solid var(--bg); box-shadow:0 0 0 1px var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:30px; color:var(--muted);
   }
   .edit-fab{
-    position:absolute; right:-2px; bottom:0; width:32px; height:32px; border-radius:50%;
-    background:var(--primary); color:#fff; border:2px solid var(--bg);
-    display:flex; align-items:center; justify-content:center; font-size:13px;
+    position:absolute; right:-2px; bottom:0; width:28px; height:28px; border-radius:50%;
+    background:var(--primary); color:#fff; border:2px solid var(--surface);
+    display:flex; align-items:center; justify-content:center; font-size:11px;
     cursor:pointer; box-shadow:var(--shadow);
   }
   .edit-fab:hover{ background:var(--primary-dark); }
   .avatar-file-input{ display:none; }
 
-  .profile-username{ font-family:'Lexend',sans-serif; font-weight:700; font-size:23px; margin-bottom:6px; }
+  .profile-username{ font-family:'Lexend',sans-serif; font-weight:700; font-size:21px; margin-bottom:5px; text-align:left; }
   .profile-username .priv-tag{
     display:inline-block; font-size:11px; font-weight:600; color:var(--muted);
-    background:var(--surface); border:1px solid var(--border); border-radius:999px;
+    background:var(--bg); border:1px solid var(--border); border-radius:999px;
     padding:2px 10px; margin-left:8px; vertical-align:middle;
   }
-  .profile-about{ font-size:14.5px; color:var(--text-soft); max-width:480px; margin:0 auto 16px; white-space:pre-line; }
+  .profile-about{ font-size:14px; color:var(--text-soft); max-width:480px; margin:0; text-align:left; white-space:pre-line; }
 
-  .social-row{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+  .social-row{ display:flex; justify-content:flex-start; gap:10px; flex-wrap:wrap; margin-top:18px; }
   .social-icon{
     width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center;
     transition:all .15s; cursor:pointer; box-shadow:var(--shadow); flex-shrink:0;
@@ -100,13 +107,10 @@
   .social-icon svg{ width:19px; height:19px; }
   .social-icon:hover{ transform:translateY(-2px); box-shadow:var(--shadow-hover); }
 
-  .owner-toolbar{
-    display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
-    margin-bottom:28px; padding:12px 16px; background:var(--surface); border:1px solid var(--border);
-    border-radius:999px; max-width:fit-content; margin-left:auto; margin-right:auto;
+  .profile-owner-menu{
+    display:flex; flex-direction:column; align-items:flex-end; gap:9px; flex-shrink:0;
   }
-  .owner-toolbar .divider{ width:1px; height:18px; background:var(--border); }
-  .visibility-toggle{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-soft); }
+  .visibility-toggle{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--text-soft); white-space:nowrap; }
   .switch{ position:relative; width:40px; height:23px; flex-shrink:0; }
   .switch input{ opacity:0; width:0; height:0; }
   .slider{ position:absolute; inset:0; background:var(--border); border-radius:999px; cursor:pointer; transition:.2s; }
@@ -116,17 +120,18 @@
   .switch.mini{ width:34px; height:20px; }
   .switch.mini .slider::before{ width:14px; height:14px; }
   .switch.mini input:checked + .slider::before{ transform:translateX(14px); }
-  .toolbar-link{ font-size:13px; font-weight:600; color:var(--text-soft); cursor:pointer; }
+  .toolbar-link{ font-size:12.5px; font-weight:600; color:var(--text-soft); cursor:pointer; white-space:nowrap; }
   .toolbar-link:hover{ color:var(--primary); }
+  .toolbar-link.danger:hover{ color:var(--danger); }
   .share-pill{
     display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:700;
-    color:var(--text-soft); cursor:pointer; background:var(--surface); border:1.5px solid var(--border);
+    color:var(--text-soft); cursor:pointer; background:var(--bg); border:1.5px solid var(--border);
     border-radius:999px; padding:10px 20px; transition:all .15s;
   }
   .share-pill:hover{ border-color:var(--primary); color:var(--primary); }
   .share-pill.sm{ padding:7px 14px; font-size:12.5px; gap:5px; }
 
-  .just-share{ display:flex; justify-content:center; margin-bottom:28px; }
+  .just-share{ display:flex; justify-content:flex-start; margin-top:18px; }
 
   /* ---------- mini dashboard ---------- */
   .dashboard{ margin-bottom:24px; }
@@ -283,7 +288,12 @@
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
   @media(max-width:480px){
-    .owner-toolbar{ max-width:100%; }
+    .profile-card{ padding:20px 18px; }
+    .profile-card-top{ flex-direction:column; align-items:flex-start; }
+    .profile-owner-menu{
+      flex-direction:row; align-items:center; flex-wrap:wrap; width:100%;
+      gap:14px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border);
+    }
   }
 </style>
 </head>
@@ -317,32 +327,35 @@
 
   <div id="stateProfile" style="display:none;">
 
-    <div class="profile-head">
-      <div class="avatar-wrap">
-        <img class="avatar-big" id="avatarImg" style="display:none;" onclick="openLightbox(this.src)">
-        <div class="avatar-placeholder" id="avatarPlaceholder">👤</div>
-        <div class="edit-fab" id="btnEditAvatar" title="แก้ไขรูปโปรไฟล์" style="display:none;">✏️</div>
-        <input type="file" class="avatar-file-input" id="avatarFileInput" accept="image/*">
-      </div>
+    <div class="profile-card">
+      <div class="profile-card-top">
+        <div class="profile-identity">
+          <div class="avatar-wrap">
+            <img class="avatar-big" id="avatarImg" style="display:none;" onclick="openLightbox(this.src)">
+            <div class="avatar-placeholder" id="avatarPlaceholder">👤</div>
+            <div class="edit-fab" id="btnEditAvatar" title="แก้ไขรูปโปรไฟล์" style="display:none;">✏️</div>
+            <input type="file" class="avatar-file-input" id="avatarFileInput" accept="image/*">
+          </div>
+          <div class="profile-identity-text">
+            <div class="profile-username" id="profileUsername">—<span class="priv-tag" id="privTag" style="display:none;">ส่วนตัว</span></div>
+            <div class="profile-about" id="profileAbout" style="display:none;"></div>
+          </div>
+        </div>
 
-      <div class="profile-username" id="profileUsername">—<span class="priv-tag" id="privTag" style="display:none;">ส่วนตัว</span></div>
-      <div class="profile-about" id="profileAbout" style="display:none;"></div>
+        <div class="profile-owner-menu" id="ownerToolbar" style="display:none;">
+          <div class="visibility-toggle">
+            <span>เปิดสาธารณะ</span>
+            <label class="switch mini">
+              <input type="checkbox" id="accountPublicToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <span class="toolbar-link" id="btnGoFullEdit">แก้ไขข้อมูลโปรไฟล์</span>
+          <span class="toolbar-link danger" id="btnLogoutOwner">ออกจากระบบ</span>
+        </div>
+      </div>
 
       <div class="social-row" id="socialRow"></div>
-
-      <div class="owner-toolbar" id="ownerToolbar" style="display:none;">
-        <div class="visibility-toggle">
-          <span>เปิดสาธารณะ</span>
-          <label class="switch mini">
-            <input type="checkbox" id="accountPublicToggle">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <div class="divider"></div>
-        <span class="toolbar-link" id="btnGoFullEdit">แก้ไขข้อมูลโปรไฟล์</span>
-        <div class="divider"></div>
-        <span class="toolbar-link" id="btnLogoutOwner">ออกจากระบบ</span>
-      </div>
 
       <div class="just-share">
         <button class="share-pill" id="btnShareProfile">🔗 Share this profile</button>
@@ -574,6 +587,19 @@
     const hh = parseInt(m[4],10), mm = parseInt(m[5],10);
     if(monthIdx < 0) return 0;
     return new Date(yearAD, monthIdx, day, hh, mm).getTime();
+  }
+
+  // แปลงวันที่ไทย "24 ก.ค. 2569 14:34 น." เป็นตัวเลขล้วนแบบ "24/07/2569 14:34 น."
+  // (คงปี พ.ศ. เดิมไว้ตรงกับที่เก็บในชีทเป๊ะๆ แค่เปลี่ยนจากชื่อเดือนย่อภาษาไทยเป็นตัวเลข ให้ชาวต่างชาติอ่านง่ายขึ้นและตรงกับข้อมูลดิบในชีท)
+  function formatDateNumeric(str){
+    if(!str) return '';
+    const m = String(str).match(/^(\d{1,2})\s+(\S+)\s+(\d{4})\s+(\d{2}):(\d{2})/);
+    if(!m) return str;
+    const day = m[1].padStart(2, '0');
+    const monthIdx = THAI_MONTHS_SHORT.indexOf(m[2]);
+    if(monthIdx < 0) return str;
+    const month = String(monthIdx + 1).padStart(2, '0');
+    return `${day}/${month}/${m[3]} ${m[4]}:${m[5]} น.`;
   }
 
   function showMsg(id, text, type){
@@ -1027,17 +1053,20 @@
           <button class="desc-toggle">▼ อ่านเพิ่มเติม</button>
           ${tags.length ? `<div class="item-tags">${tags.map(t=>'#'+esc(t)).join(' ')}</div>` : ''}
           <div class="item-footer">
-            <span class="item-date">${esc(i.updated_at || i.created_at || '')}</span>
+            <span class="item-date">${esc(formatDateNumeric(i.updated_at || i.created_at))}</span>
             ${isOwner && isPrivate ? `<span class="private-badge">ส่วนตัว</span>` : ''}
           </div>
           <div class="item-share-row">
             <button class="share-pill sm btn-share-item">🔗 Share</button>
           </div>
           <div class="item-owner-row" style="${isOwner ? '' : 'display:none;'}">
-            <label class="switch mini" title="เปิด/ปิดสาธารณะ">
-              <input type="checkbox" class="item-public-toggle" data-item-id="${i.item_id}" ${!isPrivate ? 'checked' : ''}>
-              <span class="slider"></span>
-            </label>
+            <div class="visibility-toggle">
+              <span>เปิดสาธารณะ</span>
+              <label class="switch mini" title="เปิด/ปิดสาธารณะ">
+                <input type="checkbox" class="item-public-toggle" data-item-id="${i.item_id}" ${!isPrivate ? 'checked' : ''}>
+                <span class="slider"></span>
+              </label>
+            </div>
             <button class="icon-btn btn-edit-item" aria-label="แก้ไข">✏️</button>
           </div>
         </div>
