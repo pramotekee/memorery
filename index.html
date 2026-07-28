@@ -123,6 +123,14 @@
 
   .category-summary{ max-width:1240px; margin:0 auto; padding:28px 24px 4px; }
   .category-summary h3{ font-size:14px; font-weight:700; color:var(--text-soft); margin-bottom:14px; }
+  .category-summary-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+  .category-summary-head h3{ margin-bottom:0; }
+  .viz-btn{
+    display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700;
+    color:#fff; background:#5BAE93; border:none; border-radius:999px; padding:7px 14px;
+    cursor:pointer; transition:filter .15s;
+  }
+  .viz-btn:hover{ filter:brightness(1.06); }
   .category-pills{ display:flex; gap:10px; flex-wrap:wrap; }
   .category-pill{
     display:inline-flex; align-items:center; gap:6px;
@@ -242,6 +250,58 @@
   @media(max-width:860px){
     .stats-row{ gap:28px; }
   }
+
+  /* ---------- LIST VIEW: compact on mobile so thumbs never overflow the card ---------- */
+  @media(max-width:640px){
+    .list-view .profile-card{ gap:10px; padding:14px; }
+    .list-view .card-head{ flex:0 0 118px; gap:8px; min-width:0; }
+    .list-view .avatar{ width:36px; height:36px; }
+    .list-view .card-username{
+      font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .list-view .card-count{
+      font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .list-view .fan-thumbs{ flex:1; height:44px; gap:5px; min-width:0; overflow:hidden; }
+    .list-view .fan-thumbs .thumb{ width:32px; height:44px; }
+  }
+
+  /* ---------- VISUALIZE PIE CHART MODAL ---------- */
+  .viz-overlay{
+    display:none; position:fixed; inset:0; background:rgba(30,26,22,0.55);
+    z-index:200; align-items:center; justify-content:center; padding:20px;
+  }
+  .viz-overlay.show{ display:flex; }
+  .viz-box{
+    position:relative; background:var(--surface); border-radius:var(--radius);
+    max-width:460px; width:100%; max-height:88vh; overflow-y:auto;
+    padding:28px 24px 24px; box-shadow:var(--shadow-hover);
+  }
+  .viz-close{
+    position:absolute; top:14px; right:14px; width:32px; height:32px; border-radius:50%;
+    border:none; background:var(--bg); color:var(--text-soft); font-size:16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition:background .15s;
+  }
+  .viz-close:hover{ background:var(--border); }
+  .viz-box h3{ font-size:16px; margin-bottom:6px; }
+  .viz-detail{
+    font-size:13px; color:var(--text-soft); min-height:18px; margin-bottom:16px;
+  }
+  .viz-detail b{ color:var(--text); }
+  .viz-chart-wrap{ display:flex; justify-content:center; margin-bottom:20px; }
+  .viz-chart-wrap svg{ width:200px; height:200px; }
+  .viz-chart-wrap path, .viz-chart-wrap circle{ cursor:pointer; transition:opacity .15s; stroke:var(--surface); stroke-width:1.5; }
+  .viz-chart-wrap path:hover, .viz-chart-wrap circle:hover{ opacity:0.82; }
+  .viz-legend{ display:flex; flex-direction:column; gap:8px; }
+  .viz-legend-row{
+    display:flex; align-items:center; gap:10px; font-size:13px; padding:4px 6px;
+    border-radius:8px; cursor:pointer; transition:background .15s;
+  }
+  .viz-legend-row:hover, .viz-legend-row.active{ background:var(--bg); }
+  .viz-legend-dot{ width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+  .viz-legend-label{ flex:1; }
+  .viz-legend-value{ color:var(--text-soft); font-size:12.5px; white-space:nowrap; }
+  .viz-empty{ text-align:center; color:var(--text-soft); font-size:13.5px; padding:20px 0; }
 </style>
 </head>
 <body>
@@ -270,7 +330,10 @@
 </div>
 
 <div class="category-summary">
-  <h3>หมวดความทรงจำ</h3>
+  <div class="category-summary-head">
+    <h3>หมวดความทรงจำ</h3>
+    <button class="viz-btn" id="btnOpenViz" type="button">📊 Visualize</button>
+  </div>
   <div class="category-pills" id="categoryPills"></div>
 </div>
 
@@ -335,23 +398,36 @@
   </div>
 </footer>
 
+<div class="viz-overlay" id="vizOverlay">
+  <div class="viz-box" id="vizBox">
+    <button class="viz-close" id="vizCloseBtn" aria-label="ปิด">✕</button>
+    <h3>สัดส่วนความทรงจำแต่ละหมวด</h3>
+    <div class="viz-detail" id="vizDetail"></div>
+    <div class="viz-chart-wrap">
+      <svg id="vizPieSvg" viewBox="0 0 200 200"></svg>
+    </div>
+    <div class="viz-legend" id="vizLegend"></div>
+  </div>
+</div>
+
 <script>
   const CONFIG = {
     API_URL: 'https://script.google.com/macros/s/AKfycbxlD0LwyG7Y6HS_dSZqPpy805SUwAwrA5f9sdYF49d7WRUvXlBXTX7SS_C0926eruFgpQ/exec'
   };
 
   const MEMORY_TYPES = [
-    {key:'Love', emoji:'❤️', label:'Love'}, {key:'Family', emoji:'👨‍👩‍👧', label:'Family'},
-    {key:'Friends', emoji:'🤝', label:'Friends'}, {key:'Travel', emoji:'✈️', label:'Travel'},
-    {key:'Entertainment', emoji:'🎭', label:'Entertainment'}, {key:'Learning', emoji:'📚', label:'Learning'},
-    {key:'Career', emoji:'💼', label:'Career'}, {key:'Health', emoji:'🏃', label:'Health'},
-    {key:'Pets', emoji:'🐶', label:'Pets'}, {key:'Nature', emoji:'🌱', label:'Nature'},
-    {key:'Giving', emoji:'🙏', label:'Giving'}, {key:'Celebration', emoji:'🎉', label:'Celebration'},
-    {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Other', emoji:'💡', label:'Other'}
+    {key:'Career', emoji:'💼', label:'Career', color:'#C97B4A'}, {key:'Celebration', emoji:'🎉', label:'Celebration', color:'#E0A73E'},
+    {key:'Dream', emoji:'⭐', label:'Dream', color:'#F2C14E'}, {key:'Entertainment', emoji:'🎭', label:'Entertainment', color:'#B0578D'},
+    {key:'Family', emoji:'👨‍👩‍👧', label:'Family', color:'#5B8C5A'}, {key:'Friends', emoji:'🤝', label:'Friends', color:'#4E8098'},
+    {key:'Giving', emoji:'🙏', label:'Giving', color:'#7A6BAF'}, {key:'Health', emoji:'🏃', label:'Health', color:'#4CA37B'},
+    {key:'Learning', emoji:'📚', label:'Learning', color:'#3D7CB8'}, {key:'Love', emoji:'❤️', label:'Love', color:'#D1495B'},
+    {key:'Nature', emoji:'🌱', label:'Nature', color:'#6FA86A'}, {key:'Pets', emoji:'🐶', label:'Pets', color:'#D98652'},
+    {key:'Travel', emoji:'✈️', label:'Travel', color:'#3E9C9C'}, {key:'Other', emoji:'💡', label:'Other', color:'#9B9186'}
   ];
 
   let allCards = [];
   let currentView = 'card';
+  let lastCategoryCounts = {};
 
   function initFilters(){
     const typeSel = document.getElementById('filterMemoryType');
@@ -373,7 +449,8 @@
         allCards = data.cards;
         renderCards();
         updateStats(data);
-        renderCategoryPills(data.category_counts || {});
+        lastCategoryCounts = data.category_counts || {};
+        renderCategoryPills(lastCategoryCounts);
       }
     }catch(err){
       document.getElementById('cardsGrid').innerHTML = `<div class="empty-state">โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง</div>`;
@@ -401,6 +478,109 @@
       });
     });
   }
+
+  /* ---------- VISUALIZE PIE CHART ---------- */
+  function polarToCartesian(cx, cy, r, angleDeg){
+    const rad = (angleDeg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function pieSlicePath(cx, cy, r, startAngle, endAngle){
+    const startPt = polarToCartesian(cx, cy, r, startAngle);
+    const endPt = polarToCartesian(cx, cy, r, endAngle);
+    const largeArcFlag = (endAngle - startAngle) > 180 ? 1 : 0;
+    return `M ${cx} ${cy} L ${startPt.x} ${startPt.y} A ${r} ${r} 0 ${largeArcFlag} 1 ${endPt.x} ${endPt.y} Z`;
+  }
+
+  function renderVizChart(counts){
+    const svg = document.getElementById('vizPieSvg');
+    const legend = document.getElementById('vizLegend');
+    const detail = document.getElementById('vizDetail');
+    const total = MEMORY_TYPES.reduce((s,t) => s + (counts[t.key] || 0), 0);
+
+    svg.innerHTML = '';
+    detail.innerHTML = '';
+
+    if(total === 0){
+      legend.innerHTML = `<div class="viz-empty">ยังไม่มีความทรงจำให้แสดงผลกราฟตอนนี้</div>`;
+      return;
+    }
+
+    detail.innerHTML = `รวมทั้งหมด <b>${total}</b> ชิ้น — แตะหมวดในกราฟหรือในรายการเพื่อดูรายละเอียด`;
+
+    const cx = 100, cy = 100, r = 96;
+    let cumulative = 0;
+    const slices = [];
+    MEMORY_TYPES.forEach(t => {
+      const value = counts[t.key] || 0;
+      if(value <= 0) return;
+      const fraction = value / total;
+      const startAngle = cumulative * 360;
+      const endAngle = (cumulative + fraction) * 360;
+      slices.push({ ...t, value, fraction, startAngle, endAngle });
+      cumulative += fraction;
+    });
+
+    const ns = 'http://www.w3.org/2000/svg';
+    slices.forEach(s => {
+      let el;
+      if(s.fraction >= 0.9995){ // 1 หมวดครอง 100% วาดเป็นวงกลมเต็ม เพราะ arc เดียวจะวาดไม่ได้ (จุดเริ่ม/จบซ้อนกัน)
+        el = document.createElementNS(ns, 'circle');
+        el.setAttribute('cx', cx); el.setAttribute('cy', cy); el.setAttribute('r', r);
+      } else {
+        el = document.createElementNS(ns, 'path');
+        el.setAttribute('d', pieSlicePath(cx, cy, r, s.startAngle, s.endAngle));
+      }
+      el.setAttribute('fill', s.color);
+      el.dataset.key = s.key;
+      el.addEventListener('click', () => selectVizSlice(s));
+      svg.appendChild(el);
+    });
+
+    legend.innerHTML = MEMORY_TYPES.map(t => {
+      const value = counts[t.key] || 0;
+      const pct = total ? ((value / total) * 100).toFixed(1) : '0.0';
+      return `
+        <div class="viz-legend-row" data-key="${t.key}">
+          <span class="viz-legend-dot" style="background:${t.color}"></span>
+          <span class="viz-legend-label">${t.emoji} ${t.label}</span>
+          <span class="viz-legend-value">${value} ชิ้น (${pct}%)</span>
+        </div>
+      `;
+    }).join('');
+
+    legend.querySelectorAll('.viz-legend-row').forEach(row => {
+      row.addEventListener('click', () => {
+        const found = slices.find(s => s.key === row.dataset.key);
+        if(found) selectVizSlice(found);
+      });
+    });
+  }
+
+  function selectVizSlice(s){
+    const pct = ((s.fraction) * 100).toFixed(1);
+    document.getElementById('vizDetail').innerHTML =
+      `${s.emoji} <b>${s.label}</b> — ${s.value} ชิ้น (${pct}%)`;
+    document.querySelectorAll('#vizPieSvg path, #vizPieSvg circle').forEach(el => {
+      el.style.opacity = (el.dataset.key === s.key) ? '1' : '0.45';
+    });
+    document.querySelectorAll('.viz-legend-row').forEach(row => {
+      row.classList.toggle('active', row.dataset.key === s.key);
+    });
+  }
+
+  function openVizModal(){
+    renderVizChart(lastCategoryCounts);
+    document.getElementById('vizOverlay').classList.add('show');
+  }
+  function closeVizModal(){
+    document.getElementById('vizOverlay').classList.remove('show');
+  }
+
+  document.getElementById('btnOpenViz').addEventListener('click', openVizModal);
+  document.getElementById('vizCloseBtn').addEventListener('click', closeVizModal);
+  document.getElementById('vizOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'vizOverlay') closeVizModal(); // แตะพื้นหลังรอบนอกเท่านั้นถึงปิด กันแตะโดนกราฟแล้วปิดพลาด
+  });
 
   function renderCards(){
     const grid = document.getElementById('cardsGrid');
