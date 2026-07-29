@@ -168,6 +168,17 @@
   }
   .view-toggle button.active{ background:var(--primary); color:#fff; }
 
+  .search-status{
+    display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-soft);
+    min-height:20px; margin-top:14px;
+  }
+  .search-status .spin{
+    width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--primary);
+    border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .search-status b{ color:var(--text); }
+
   /* ---------- CARDS GRID ---------- */
   .cards-section{ max-width:1240px; margin:0 auto; padding:36px 24px 80px; }
   .cards-grid{
@@ -284,6 +295,7 @@
   }
   .viz-close:hover{ background:var(--border); }
   .viz-box h3{ font-size:16px; margin-bottom:6px; }
+  .viz-subtext{ font-size:11.5px; color:var(--text-soft); opacity:0.9; line-height:1.5; margin-bottom:14px; }
   .viz-detail{
     font-size:13px; color:var(--text-soft); min-height:18px; margin-bottom:16px;
   }
@@ -357,6 +369,7 @@
       <button data-view="list">List</button>
     </div>
   </div>
+  <div class="search-status" id="searchStatus"></div>
 </div>
 
 <div class="cards-section">
@@ -402,6 +415,7 @@
   <div class="viz-box" id="vizBox">
     <button class="viz-close" id="vizCloseBtn" aria-label="ปิด">✕</button>
     <h3>สัดส่วนความทรงจำแต่ละหมวด</h3>
+    <div class="viz-subtext">ความทรงจำ 1 ชิ้น อยู่ได้มากกว่า 1 หมวด ผลรวมของแต่ละหมวดจึงอาจมากกว่าจำนวนชิ้นทั้งหมด</div>
     <div class="viz-detail" id="vizDetail"></div>
     <div class="viz-chart-wrap">
       <svg id="vizPieSvg" viewBox="0 0 200 200"></svg>
@@ -443,6 +457,10 @@
       memory_type: document.getElementById('filterMemoryType').value,
       tag: document.getElementById('filterTag').value
     });
+
+    const status = document.getElementById('searchStatus');
+    status.innerHTML = `<span class="spin"></span> กำลังค้นหา...`;
+
     try{
       const res = await fetch(`${CONFIG.API_URL}?${params.toString()}`);
       const data = await res.json();
@@ -453,9 +471,14 @@
         lastTotalItems = data.total_items ?? allCards.reduce((sum,c)=>sum+(c.item_count||0),0);
         lastCategoryCounts = data.category_counts || {};
         renderCategoryPills(lastCategoryCounts);
+
+        const matchUsers = data.matching_user_count ?? allCards.length;
+        const matchItems = data.matching_item_count ?? allCards.reduce((sum,c)=>sum+(c.item_count||0),0);
+        status.innerHTML = `พบ <b>${matchUsers}</b> คน • <b>${matchItems}</b> ชิ้น`;
       }
     }catch(err){
       document.getElementById('cardsGrid').innerHTML = `<div class="empty-state">โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง</div>`;
+      status.innerHTML = '';
     }
   }
 
@@ -467,14 +490,15 @@
   function renderCategoryPills(counts){
     const wrap = document.getElementById('categoryPills');
     const selected = document.getElementById('filterMemoryType').value;
-    wrap.innerHTML = MEMORY_TYPES.map(t => `
+    const allPill = `<span class="category-pill${selected === '' ? ' selected' : ''}" data-key="">ทั้งหมด <b>${lastTotalItems}</b></span>`;
+    wrap.innerHTML = allPill + MEMORY_TYPES.map(t => `
       <span class="category-pill${t.key === selected ? ' selected' : ''}" data-key="${t.key}">${t.emoji} ${t.label} <b>${counts[t.key] || 0}</b></span>
     `).join('');
     wrap.querySelectorAll('.category-pill').forEach(el => {
       el.addEventListener('click', () => {
         const key = el.dataset.key;
         const sel = document.getElementById('filterMemoryType');
-        sel.value = (sel.value === key) ? '' : key; // กด pill เดิมซ้ำ = ยกเลิกฟิลเตอร์ กลับไปโชว์ทุกหมวด
+        sel.value = (key === '') ? '' : ((sel.value === key) ? '' : key); // กด pill เดิมซ้ำ หรือกด "ทั้งหมด" = ยกเลิกฟิลเตอร์
         document.getElementById('cards').scrollIntoView({ behavior: 'smooth', block: 'start' });
         fetchCards();
       });
