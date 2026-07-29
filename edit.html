@@ -176,20 +176,6 @@
 
   .empty-items{ text-align:center; color:var(--text-soft); font-size:13.5px; padding:24px; background:var(--surface); border:1px dashed var(--border); border-radius:14px; }
 
-  /* ---------- Add item pill (header) ---------- */
-  .section-heading-right{ display:flex; align-items:center; gap:8px; }
-  .add-item-pill{
-    font-size:12.5px; font-weight:700; color:var(--primary); border:1.5px solid var(--primary);
-    border-radius:999px; padding:4px 12px; cursor:pointer; user-select:none; transition:all .15s; white-space:nowrap;
-  }
-  .add-item-pill:hover{ background:var(--primary); color:#fff; }
-
-  /* ---------- Empty state: ชวนเพิ่มไอเทมแรก ---------- */
-  .empty-items-cta{ text-align:center; padding:36px 20px; background:var(--surface); border:1.5px dashed var(--primary); border-radius:14px; }
-  .empty-cta-icon{ font-size:32px; margin-bottom:10px; }
-  .empty-cta-text{ font-size:15px; font-weight:700; color:var(--text); margin-bottom:16px; }
-  .empty-cta-btn{ width:auto; padding:12px 24px; display:inline-flex; }
-
   /* ---------- Modal (item edit) ---------- */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(26,31,44,0.5);
@@ -324,10 +310,7 @@
 
     <div class="section-heading">
       <h3>ความทรงจำของฉัน</h3>
-      <div class="section-heading-right">
-        <span id="itemCountLabel"></span>
-        <span class="add-item-pill" id="btnOpenAddItem">+ เพิ่ม</span>
-      </div>
+      <span id="itemCountLabel"></span>
     </div>
     <div id="itemsList"></div>
 
@@ -385,53 +368,6 @@
   </div>
 </div>
 
-<!-- ===================== MODAL: เพิ่ม item ใหม่ ===================== -->
-<div class="modal-overlay" id="addItemModal">
-  <div class="modal-box">
-    <h3>เพิ่มความทรงจำใหม่</h3>
-    <div class="msg" id="addItemMsg"></div>
-
-    <label>รูปของชิ้นนี้</label>
-    <div class="item-image-upload" id="addItemImagePreview">
-      <span class="plus" id="addItemImagePlus">＋</span>
-      <span id="addItemImageLabel">เพิ่มรูปภาพ</span>
-      <img id="addItemImg" style="display:none;">
-      <div class="upload-spinner" id="addItemImageSpinner"><div class="spinner-ring"></div></div>
-      <input type="file" id="addItemFile" accept="image/*">
-    </div>
-
-    <label>Memory Type (เลือกได้หลายอัน)</label>
-    <div class="type-grid" id="addTypeGrid"></div>
-
-    <label>เล่าความรู้สึก / เรื่องราวของชิ้นนี้</label>
-    <textarea id="addDescriptionInput" placeholder="เกิดอะไรขึ้นตอนนั้น รู้สึกยังไง..."></textarea>
-
-    <label>Tag (อย่างน้อย 1 อัน)</label>
-    <div class="tag-row">
-      <input type="text" class="add-tag-input" placeholder="tag 1">
-      <input type="text" class="add-tag-input" placeholder="tag 2">
-      <input type="text" class="add-tag-input" placeholder="tag 3">
-      <input type="text" class="add-tag-input" placeholder="tag 4">
-      <input type="text" class="add-tag-input" placeholder="tag 5">
-    </div>
-    <div style="height:18px;"></div>
-
-    <div class="toggle-row">
-      <div>
-        <div class="toggle-label">แสดงชิ้นนี้แบบสาธารณะ</div>
-        <div class="toggle-desc">คนอื่นเห็นชิ้นนี้ได้ถ้าโปรไฟล์เปิดสาธารณะด้วย</div>
-      </div>
-      <label class="switch">
-        <input type="checkbox" id="addItemIsPublicInput" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <button class="btn btn-primary" id="btnSaveAddItem">บันทึกความทรงจำนี้</button>
-    <button class="btn btn-outline" id="btnCancelAddItem">ยกเลิก</button>
-  </div>
-</div>
-
 <!-- ===================== MODAL: ยืนยันลบ item ===================== -->
 <div class="modal-overlay" id="deleteConfirmModal">
   <div class="modal-box">
@@ -465,13 +401,13 @@
   const PROVINCES = ["กรุงเทพมหานคร","กระบี่","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร","ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร","เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม","นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส","น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี","ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก","เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน","ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง","ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ","สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย","สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง","อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี"];
 
   const MEMORY_TYPES = [
-    {key:'Love', emoji:'❤️', label:'Love'}, {key:'Family', emoji:'👨‍👩‍👧', label:'Family'},
-    {key:'Friends', emoji:'🤝', label:'Friends'}, {key:'Travel', emoji:'✈️', label:'Travel'},
-    {key:'Entertainment', emoji:'🎭', label:'Entertainment'}, {key:'Learning', emoji:'📚', label:'Learning'},
-    {key:'Career', emoji:'💼', label:'Career'}, {key:'Health', emoji:'🏃', label:'Health'},
-    {key:'Pets', emoji:'🐶', label:'Pets'}, {key:'Nature', emoji:'🌱', label:'Nature'},
-    {key:'Giving', emoji:'🙏', label:'Giving'}, {key:'Celebration', emoji:'🎉', label:'Celebration'},
-    {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Other', emoji:'💡', label:'Other'}
+    {key:'Career', emoji:'💼', label:'Career'}, {key:'Celebration', emoji:'🎉', label:'Celebration'},
+    {key:'Dream', emoji:'⭐', label:'Dream'}, {key:'Entertainment', emoji:'🎭', label:'Entertainment'},
+    {key:'Family', emoji:'👨‍👩‍👧', label:'Family'}, {key:'Friends', emoji:'🤝', label:'Friends'},
+    {key:'Giving', emoji:'🙏', label:'Giving'}, {key:'Health', emoji:'🏃', label:'Health'},
+    {key:'Learning', emoji:'📚', label:'Learning'}, {key:'Love', emoji:'❤️', label:'Love'},
+    {key:'Nature', emoji:'🌱', label:'Nature'}, {key:'Pets', emoji:'🐶', label:'Pets'},
+    {key:'Travel', emoji:'✈️', label:'Travel'}, {key:'Other', emoji:'💡', label:'Other'}
   ];
 
   // ===================== STATE (เก็บไว้ใน memory เท่านั้น ไม่แตะ localStorage — pattern เดียวกับ create.html) =====================
@@ -483,8 +419,6 @@
   let editSelectedTypes = new Set();
   let editItemImageUrl = '';
   let deleteTargetId = null;
-  let addSelectedTypes = new Set();
-  let addItemImageUrl = '';
 
   function showMsg(id, text, type){
     const el = document.getElementById(id);
@@ -528,20 +462,6 @@
       el.addEventListener('click', () => {
         if(editSelectedTypes.has(t.key)){ editSelectedTypes.delete(t.key); el.classList.remove('selected'); }
         else{ editSelectedTypes.add(t.key); el.classList.add('selected'); }
-      });
-      grid.appendChild(el);
-    });
-  }
-  function initAddTypeGrid(){
-    const grid = document.getElementById('addTypeGrid');
-    MEMORY_TYPES.forEach(t => {
-      const el = document.createElement('div');
-      el.className = 'type-pill';
-      el.textContent = `${t.emoji} ${t.label}`;
-      el.dataset.key = t.key;
-      el.addEventListener('click', () => {
-        if(addSelectedTypes.has(t.key)){ addSelectedTypes.delete(t.key); el.classList.remove('selected'); }
-        else{ addSelectedTypes.add(t.key); el.classList.add('selected'); }
       });
       grid.appendChild(el);
     });
@@ -652,29 +572,6 @@
     }catch(err){
       showMsg('itemEditMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
       if(!editItemImageUrl){ plus.style.display = 'block'; label.style.display = 'block'; }
-    }
-    spinner.classList.remove('show');
-  });
-
-  document.getElementById('addItemImagePreview').addEventListener('click', () => document.getElementById('addItemFile').click());
-  document.getElementById('addItemFile').addEventListener('change', async function(){
-    const file = this.files[0];
-    if(!file) return;
-    const plus = document.getElementById('addItemImagePlus');
-    const label = document.getElementById('addItemImageLabel');
-    const img = document.getElementById('addItemImg');
-    const spinner = document.getElementById('addItemImageSpinner');
-    plus.style.display = 'none';
-    label.style.display = 'none';
-    spinner.classList.add('show');
-    try{
-      const url = await uploadImageFile(file);
-      addItemImageUrl = url;
-      img.src = url;
-      img.style.display = 'block';
-    }catch(err){
-      showMsg('addItemMsg', 'อัปโหลดรูปไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
-      if(!addItemImageUrl){ plus.style.display = 'block'; label.style.display = 'block'; }
     }
     spinner.classList.remove('show');
   });
@@ -815,13 +712,7 @@
     document.getElementById('itemCountLabel').textContent = myItems.length ? `${myItems.length} ชิ้น` : '';
 
     if(!myItems.length){
-      wrap.innerHTML = `
-        <div class="empty-items-cta">
-          <div class="empty-cta-icon">✨</div>
-          <div class="empty-cta-text">ยังไม่มีความทรงจำที่เพิ่มไว้เลย</div>
-          <button class="btn btn-primary empty-cta-btn" onclick="openAddItemModal()">+ เพิ่มความทรงจำที่มีค่าของคุณ</button>
-        </div>
-      `;
+      wrap.innerHTML = `<div class="empty-items">ยังไม่มีความทรงจำที่เพิ่มไว้ <a href="create.html" style="color:var(--primary); text-decoration:underline;">เพิ่มชิ้นแรกเลย</a></div>`;
       return;
     }
 
@@ -925,72 +816,6 @@
     btn.disabled = false; btn.textContent = 'บันทึกการแก้ไข';
   });
 
-  // ===================== ADD ITEM MODAL =====================
-  function resetAddItemForm(){
-    addSelectedTypes = new Set();
-    addItemImageUrl = '';
-    document.querySelectorAll('#addTypeGrid .type-pill').forEach(p => p.classList.remove('selected'));
-
-    const img = document.getElementById('addItemImg');
-    img.style.display = 'none'; img.src = '';
-    document.getElementById('addItemImagePlus').style.display = 'block';
-    document.getElementById('addItemImageLabel').style.display = 'block';
-
-    document.getElementById('addDescriptionInput').value = '';
-    document.querySelectorAll('.add-tag-input').forEach(el => { el.value = ''; });
-    document.getElementById('addItemIsPublicInput').checked = true;
-    clearMsg('addItemMsg');
-  }
-
-  function openAddItemModal(){
-    resetAddItemForm();
-    document.getElementById('addItemModal').classList.add('show');
-  }
-
-  document.getElementById('btnOpenAddItem').addEventListener('click', openAddItemModal);
-
-  document.getElementById('btnCancelAddItem').addEventListener('click', () => {
-    document.getElementById('addItemModal').classList.remove('show');
-  });
-
-  document.getElementById('btnSaveAddItem').addEventListener('click', async () => {
-    clearMsg('addItemMsg');
-    const tags = Array.from(document.querySelectorAll('.add-tag-input')).map(i => i.value.trim()).filter(Boolean);
-    const description = document.getElementById('addDescriptionInput').value.trim();
-
-    if(addSelectedTypes.size === 0){ showMsg('addItemMsg', 'กรุณาเลือก Memory Type อย่างน้อย 1 อย่าง', 'error'); return; }
-    if(tags.length === 0){ showMsg('addItemMsg', 'กรุณากรอก Tag อย่างน้อย 1 อัน', 'error'); return; }
-
-    const btn = document.getElementById('btnSaveAddItem');
-    btn.disabled = true; btn.innerHTML = '<div class="spinner-ring"></div>';
-
-    const body = {
-      action: 'createItem',
-      user_id: session.user_id,
-      username: session.username,
-      box_code: session.box_code,
-      memory_types: Array.from(addSelectedTypes),
-      image: addItemImageUrl,
-      description,
-      tags,
-      is_public: document.getElementById('addItemIsPublicInput').checked
-    };
-
-    try{
-      const res = await fetch(CONFIG.API_URL, { method:'POST', body: JSON.stringify(body) });
-      const data = await res.json();
-      if(data.success){
-        document.getElementById('addItemModal').classList.remove('show');
-        await loadMyProfile();
-      }else{
-        showMsg('addItemMsg', data.message || 'บันทึกไม่สำเร็จ', 'error');
-      }
-    }catch(err){
-      showMsg('addItemMsg', 'เชื่อมต่อระบบไม่สำเร็จ ลองใหม่อีกครั้ง', 'error');
-    }
-    btn.disabled = false; btn.textContent = 'บันทึกความทรงจำนี้';
-  });
-
   // ===================== DELETE ITEM =====================
   function openDeleteConfirm(item_id){
     deleteTargetId = item_id;
@@ -1034,7 +859,6 @@
   initProvinces();
   initGenderPills();
   initEditTypeGrid();
-  initAddTypeGrid();
 
   // ===================== AUTO-LOGIN จาก session ที่แชร์กับหน้า profile.html =====================
   // หน้านี้เริ่มต้นด้วย "กำลังตรวจสอบสิทธิ์..." เสมอ (ไม่โชว์ฟอร์ม login วาบขึ้นมาก่อน)
