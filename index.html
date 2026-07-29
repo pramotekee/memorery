@@ -428,6 +428,7 @@
   let allCards = [];
   let currentView = 'card';
   let lastCategoryCounts = {};
+  let lastTotalItems = 0;
 
   function initFilters(){
     const typeSel = document.getElementById('filterMemoryType');
@@ -449,6 +450,7 @@
         allCards = data.cards;
         renderCards();
         updateStats(data);
+        lastTotalItems = data.total_items ?? allCards.reduce((sum,c)=>sum+(c.item_count||0),0);
         lastCategoryCounts = data.category_counts || {};
         renderCategoryPills(lastCategoryCounts);
       }
@@ -505,7 +507,7 @@
       return;
     }
 
-    detail.innerHTML = `รวมทั้งหมด <b>${total}</b> ชิ้น — แตะหมวดในกราฟหรือในรายการเพื่อดูรายละเอียด`;
+    detail.innerHTML = `รวมทั้งหมด <b>${lastTotalItems}</b> ชิ้น — แตะหมวดในกราฟหรือในรายการเพื่อดูรายละเอียด`;
 
     const cx = 100, cy = 100, r = 96;
     let cumulative = 0;
